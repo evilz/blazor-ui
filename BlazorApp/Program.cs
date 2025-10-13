@@ -1,10 +1,14 @@
 using BlazorApp.Components;
+using Sysinfocus.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Add Sysinfocus Simple/UI services
+builder.Services.AddScoped<StateManager>();
 
 var app = builder.Build();
 
