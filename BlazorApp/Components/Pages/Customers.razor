@@ -3,177 +3,88 @@
 
 <PageTitle>Customers - Blazor UI</PageTitle>
 
-<div class="page-header">
-    <h1>Customers</h1>
-    <p>Manage your customer relationships</p>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-800 mb-1">Customers</h1>
+    <p class="text-slate-500">Manage your customer relationships</p>
 </div>
 
-<div class="card">
-    <div class="table-header">
-        <h3>Customer List</h3>
-        <button class="btn btn-primary">Add Customer</button>
+<Card>
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-semibold text-slate-800">Customer List</h3>
+        <Button Color="ButtonColor.Primary">Add Customer</Button>
     </div>
     
-    <table class="customers-table">
+    <Table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Company</th>
-                <th>Status</th>
-                <th>Joined</th>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Name</th>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Email</th>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Company</th>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Status</th>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Joined</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">JD</div>
-                        <span>John Doe</span>
+                <td class="px-3 py-3 border-b border-slate-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-semibold text-sm">JD</div>
+                        <span class="text-slate-800">John Doe</span>
                     </div>
                 </td>
-                <td>john.doe@example.com</td>
-                <td>Acme Corp</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>Jan 15, 2025</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">john.doe@example.com</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Acme Corp</td>
+                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Success">Active</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Jan 15, 2025</td>
             </tr>
             <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">JS</div>
-                        <span>Jane Smith</span>
+                <td class="px-3 py-3 border-b border-slate-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-semibold text-sm">JS</div>
+                        <span class="text-slate-800">Jane Smith</span>
                     </div>
                 </td>
-                <td>jane.smith@example.com</td>
-                <td>Tech Solutions</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>Feb 22, 2025</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">jane.smith@example.com</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Tech Solutions</td>
+                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Success">Active</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Feb 22, 2025</td>
             </tr>
             <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">BJ</div>
-                        <span>Bob Johnson</span>
+                <td class="px-3 py-3 border-b border-slate-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-semibold text-sm">BJ</div>
+                        <span class="text-slate-800">Bob Johnson</span>
                     </div>
                 </td>
-                <td>bob.johnson@example.com</td>
-                <td>Digital Ventures</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>Mar 10, 2025</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">bob.johnson@example.com</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Digital Ventures</td>
+                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Success">Active</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Mar 10, 2025</td>
             </tr>
             <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">AB</div>
-                        <span>Alice Brown</span>
+                <td class="px-3 py-3 border-b border-slate-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-semibold text-sm">AB</div>
+                        <span class="text-slate-800">Alice Brown</span>
                     </div>
                 </td>
-                <td>alice.brown@example.com</td>
-                <td>Innovation Labs</td>
-                <td><span class="status-badge inactive">Inactive</span></td>
-                <td>Apr 5, 2025</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">alice.brown@example.com</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Innovation Labs</td>
+                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Secondary">Inactive</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Apr 5, 2025</td>
             </tr>
             <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">CW</div>
-                        <span>Charlie Wilson</span>
+                <td class="px-3 py-3 border-b border-slate-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-semibold text-sm">CW</div>
+                        <span class="text-slate-800">Charlie Wilson</span>
                     </div>
                 </td>
-                <td>charlie.wilson@example.com</td>
-                <td>Global Systems</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>May 18, 2025</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">charlie.wilson@example.com</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Global Systems</td>
+                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Success">Active</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">May 18, 2025</td>
             </tr>
         </tbody>
-    </table>
-</div>
-
-<style>
-    .page-header {
-        margin-bottom: 2rem;
-    }
-
-    .page-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.25rem;
-        color: #1e293b;
-    }
-
-    .page-header p {
-        color: #64748b;
-        margin: 0;
-    }
-
-    .table-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .table-header h3 {
-        margin: 0;
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    .customers-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .customers-table th {
-        text-align: left;
-        padding: 0.75rem;
-        border-bottom: 2px solid #e2e8f0;
-        font-weight: 600;
-        color: #475569;
-        font-size: 0.875rem;
-    }
-
-    .customers-table td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #e2e8f0;
-        color: #1e293b;
-    }
-
-    .customer-name {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .avatar {
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    .status-badge.active {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .status-badge.inactive {
-        background: #f1f5f9;
-        color: #475569;
-    }
-</style>
+    </Table>
+</Card>

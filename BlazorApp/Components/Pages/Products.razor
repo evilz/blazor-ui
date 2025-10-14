@@ -3,154 +3,70 @@
 
 <PageTitle>Products - Blazor UI</PageTitle>
 
-<div class="page-header">
-    <h1>Products</h1>
-    <p>Manage your product catalog</p>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-800 mb-1">Products</h1>
+    <p class="text-slate-500">Manage your product catalog</p>
 </div>
 
-<div class="products-grid">
-    <div class="card">
-        <div class="product-card">
-            <div class="product-icon">📦</div>
-            <h3>Basic Package</h3>
-            <p class="product-price">$99/month</p>
-            <p class="product-description">Perfect for individuals and small projects</p>
-            <ul class="product-features">
-                <li>✓ 10GB Storage</li>
-                <li>✓ Basic Support</li>
-                <li>✓ 1 User</li>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <Card>
+        <div class="text-center p-4">
+            <div class="text-5xl mb-4">📦</div>
+            <h3 class="text-2xl font-semibold mb-2 text-slate-800">Basic Package</h3>
+            <p class="text-3xl font-bold text-blue-600 mb-2">$99/month</p>
+            <p class="text-slate-500 mb-6">Perfect for individuals and small projects</p>
+            <ul class="list-none p-0 mb-6 text-left space-y-2">
+                <li class="text-slate-600 text-sm py-1">✓ 10GB Storage</li>
+                <li class="text-slate-600 text-sm py-1">✓ Basic Support</li>
+                <li class="text-slate-600 text-sm py-1">✓ 1 User</li>
             </ul>
-            <button class="btn btn-primary">View Details</button>
+            <Button Color="ButtonColor.Primary" class="w-full">View Details</Button>
         </div>
-    </div>
+    </Card>
 
-    <div class="card">
-        <div class="product-card">
-            <div class="product-icon">🎯</div>
-            <h3>Standard Package</h3>
-            <p class="product-price">$149/month</p>
-            <p class="product-description">Great for growing teams and businesses</p>
-            <ul class="product-features">
-                <li>✓ 50GB Storage</li>
-                <li>✓ Priority Support</li>
-                <li>✓ 5 Users</li>
+    <Card>
+        <div class="text-center p-4">
+            <div class="text-5xl mb-4">🎯</div>
+            <h3 class="text-2xl font-semibold mb-2 text-slate-800">Standard Package</h3>
+            <p class="text-3xl font-bold text-blue-600 mb-2">$149/month</p>
+            <p class="text-slate-500 mb-6">Great for growing teams and businesses</p>
+            <ul class="list-none p-0 mb-6 text-left space-y-2">
+                <li class="text-slate-600 text-sm py-1">✓ 50GB Storage</li>
+                <li class="text-slate-600 text-sm py-1">✓ Priority Support</li>
+                <li class="text-slate-600 text-sm py-1">✓ 5 Users</li>
             </ul>
-            <button class="btn btn-primary">View Details</button>
+            <Button Color="ButtonColor.Primary" class="w-full">View Details</Button>
         </div>
-    </div>
+    </Card>
 
-    <div class="card">
-        <div class="product-card highlighted">
-            <div class="popular-badge">Popular</div>
-            <div class="product-icon">⭐</div>
-            <h3>Premium Package</h3>
-            <p class="product-price">$299/month</p>
-            <p class="product-description">Best for professional teams</p>
-            <ul class="product-features">
-                <li>✓ 200GB Storage</li>
-                <li>✓ 24/7 Support</li>
-                <li>✓ 20 Users</li>
+    <Card>
+        <div class="relative text-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg">
+            <Badge Color="BadgeColor.Primary" class="absolute top-2 right-2">Popular</Badge>
+            <div class="text-5xl mb-4">⭐</div>
+            <h3 class="text-2xl font-semibold mb-2 text-slate-800">Premium Package</h3>
+            <p class="text-3xl font-bold text-blue-600 mb-2">$299/month</p>
+            <p class="text-slate-500 mb-6">Best for professional teams</p>
+            <ul class="list-none p-0 mb-6 text-left space-y-2">
+                <li class="text-slate-600 text-sm py-1">✓ 200GB Storage</li>
+                <li class="text-slate-600 text-sm py-1">✓ 24/7 Support</li>
+                <li class="text-slate-600 text-sm py-1">✓ 20 Users</li>
             </ul>
-            <button class="btn btn-primary">View Details</button>
+            <Button Color="ButtonColor.Primary" class="w-full">View Details</Button>
         </div>
-    </div>
+    </Card>
 
-    <div class="card">
-        <div class="product-card">
-            <div class="product-icon">🚀</div>
-            <h3>Enterprise Package</h3>
-            <p class="product-price">$599/month</p>
-            <p class="product-description">For large organizations</p>
-            <ul class="product-features">
-                <li>✓ Unlimited Storage</li>
-                <li>✓ Dedicated Support</li>
-                <li>✓ Unlimited Users</li>
+    <Card>
+        <div class="text-center p-4">
+            <div class="text-5xl mb-4">🚀</div>
+            <h3 class="text-2xl font-semibold mb-2 text-slate-800">Enterprise Package</h3>
+            <p class="text-3xl font-bold text-blue-600 mb-2">$599/month</p>
+            <p class="text-slate-500 mb-6">For large organizations</p>
+            <ul class="list-none p-0 mb-6 text-left space-y-2">
+                <li class="text-slate-600 text-sm py-1">✓ Unlimited Storage</li>
+                <li class="text-slate-600 text-sm py-1">✓ Dedicated Support</li>
+                <li class="text-slate-600 text-sm py-1">✓ Unlimited Users</li>
             </ul>
-            <button class="btn btn-primary">View Details</button>
+            <Button Color="ButtonColor.Primary" class="w-full">View Details</Button>
         </div>
-    </div>
+    </Card>
 </div>
-
-<style>
-    .page-header {
-        margin-bottom: 2rem;
-    }
-
-    .page-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.25rem;
-        color: #1e293b;
-    }
-
-    .page-header p {
-        color: #64748b;
-        margin: 0;
-    }
-
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .product-card {
-        position: relative;
-        text-align: center;
-        padding: 1rem;
-    }
-
-    .product-card.highlighted {
-        background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%);
-        border-radius: 0.5rem;
-    }
-
-    .popular-badge {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        background: #3b82f6;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    .product-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-
-    .product-card h3 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #1e293b;
-    }
-
-    .product-price {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #3b82f6;
-        margin-bottom: 0.5rem;
-    }
-
-    .product-description {
-        color: #64748b;
-        margin-bottom: 1.5rem;
-    }
-
-    .product-features {
-        list-style: none;
-        padding: 0;
-        margin: 1.5rem 0;
-        text-align: left;
-    }
-
-    .product-features li {
-        padding: 0.5rem 0;
-        color: #475569;
-        font-size: 0.875rem;
-    }
-</style>

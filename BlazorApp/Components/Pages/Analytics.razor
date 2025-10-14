@@ -3,158 +3,75 @@
 
 <PageTitle>Analytics - Blazor UI</PageTitle>
 
-<div class="page-header">
-    <h1>Analytics</h1>
-    <p>Track your performance metrics</p>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-800 mb-1">Analytics</h1>
+    <p class="text-slate-500">Track your performance metrics</p>
 </div>
 
-<div class="analytics-grid">
-    <div class="card">
-        <h3>Page Views</h3>
-        <p class="metric-value">125,432</p>
-        <div class="metric-trend">
-            <span class="trend-indicator up">↑ 12.5%</span>
-            <span class="trend-period">vs last week</span>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <Card>
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Page Views</h3>
+        <p class="text-3xl font-bold text-slate-800 my-2">125,432</p>
+        <div class="flex gap-2 items-center text-sm">
+            <span class="font-semibold text-green-600">↑ 12.5%</span>
+            <span class="text-slate-500">vs last week</span>
         </div>
-    </div>
+    </Card>
 
-    <div class="card">
-        <h3>Unique Visitors</h3>
-        <p class="metric-value">45,231</p>
-        <div class="metric-trend">
-            <span class="trend-indicator up">↑ 8.2%</span>
-            <span class="trend-period">vs last week</span>
+    <Card>
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Unique Visitors</h3>
+        <p class="text-3xl font-bold text-slate-800 my-2">45,231</p>
+        <div class="flex gap-2 items-center text-sm">
+            <span class="font-semibold text-green-600">↑ 8.2%</span>
+            <span class="text-slate-500">vs last week</span>
         </div>
-    </div>
+    </Card>
 
-    <div class="card">
-        <h3>Bounce Rate</h3>
-        <p class="metric-value">34.5%</p>
-        <div class="metric-trend">
-            <span class="trend-indicator down">↓ 2.1%</span>
-            <span class="trend-period">vs last week</span>
+    <Card>
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Bounce Rate</h3>
+        <p class="text-3xl font-bold text-slate-800 my-2">34.5%</p>
+        <div class="flex gap-2 items-center text-sm">
+            <span class="font-semibold text-red-600">↓ 2.1%</span>
+            <span class="text-slate-500">vs last week</span>
         </div>
-    </div>
+    </Card>
 
-    <div class="card">
-        <h3>Avg. Session Duration</h3>
-        <p class="metric-value">3m 45s</p>
-        <div class="metric-trend">
-            <span class="trend-indicator up">↑ 15.3%</span>
-            <span class="trend-period">vs last week</span>
+    <Card>
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Avg. Session Duration</h3>
+        <p class="text-3xl font-bold text-slate-800 my-2">3m 45s</p>
+        <div class="flex gap-2 items-center text-sm">
+            <span class="font-semibold text-green-600">↑ 15.3%</span>
+            <span class="text-slate-500">vs last week</span>
         </div>
-    </div>
+    </Card>
 </div>
 
-<div class="analytics-details">
-    <div class="card">
-        <h3>Top Pages</h3>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Page</th>
-                    <th>Views</th>
-                    <th>Avg. Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>/dashboard</td>
-                    <td>12,543</td>
-                    <td>2m 15s</td>
-                </tr>
-                <tr>
-                    <td>/products</td>
-                    <td>8,234</td>
-                    <td>3m 30s</td>
-                </tr>
-                <tr>
-                    <td>/orders</td>
-                    <td>5,432</td>
-                    <td>1m 45s</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<style>
-    .page-header {
-        margin-bottom: 2rem;
-    }
-
-    .page-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.25rem;
-        color: #1e293b;
-    }
-
-    .page-header p {
-        color: #64748b;
-        margin: 0;
-    }
-
-    .analytics-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0.5rem 0;
-    }
-
-    .metric-trend {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        font-size: 0.875rem;
-    }
-
-    .trend-indicator {
-        font-weight: 600;
-    }
-
-    .trend-indicator.up {
-        color: #16a34a;
-    }
-
-    .trend-indicator.down {
-        color: #dc2626;
-    }
-
-    .trend-period {
-        color: #64748b;
-    }
-
-    .analytics-details {
-        display: grid;
-        gap: 1.5rem;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-    }
-
-    .data-table th {
-        text-align: left;
-        padding: 0.75rem;
-        border-bottom: 2px solid #e2e8f0;
-        font-weight: 600;
-        color: #475569;
-        font-size: 0.875rem;
-    }
-
-    .data-table td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #e2e8f0;
-        color: #1e293b;
-    }
-</style>
+<Card>
+    <h3 class="text-lg font-semibold text-slate-800 mb-4">Top Pages</h3>
+    <Table>
+        <thead>
+            <tr>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Page</th>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Views</th>
+                <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Avg. Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">/dashboard</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">12,543</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">2m 15s</td>
+            </tr>
+            <tr>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">/products</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">8,234</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">3m 30s</td>
+            </tr>
+            <tr>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">/orders</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">5,432</td>
+                <td class="px-3 py-3 border-b border-slate-200 text-slate-800">1m 45s</td>
+            </tr>
+        </tbody>
+    </Table>
+</Card>
