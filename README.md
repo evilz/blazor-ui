@@ -34,7 +34,7 @@ cd BlazorApp
 dotnet run
 ```
 
-Navigate to `http://localhost:5000` in your browser.
+Navigate to `http://localhost:5005` in your browser.
 
 ## Project Structure
 
