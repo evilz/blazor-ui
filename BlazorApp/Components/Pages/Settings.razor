@@ -9,7 +9,7 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <Card>
+    <div class="bg-white rounded-lg p-6 shadow">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Profile Settings</h3>
         <div class="mb-6">
             <label class="block mb-2 font-medium text-slate-600 text-sm">Display Name</label>
@@ -23,35 +23,35 @@
             <label class="block mb-2 font-medium text-slate-600 text-sm">Role</label>
             <input type="text" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-md text-sm text-slate-800 bg-slate-100 cursor-not-allowed" value="Administrator" disabled />
         </div>
-        <Button Color="ButtonColor.Primary">Save Changes</Button>
-    </Card>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Changes</button>
+    </div>
 
-    <Card>
+    <div class="bg-white rounded-lg p-6 shadow">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Notification Settings</h3>
         <div class="flex justify-between items-center py-4 border-b border-slate-200">
             <div class="flex-1">
                 <div class="font-medium text-slate-800 mb-1">Email Notifications</div>
                 <div class="text-sm text-slate-500">Receive notifications via email</div>
             </div>
-            <Switch />
+            <input type="checkbox" class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600" />
         </div>
         <div class="flex justify-between items-center py-4 border-b border-slate-200">
             <div class="flex-1">
                 <div class="font-medium text-slate-800 mb-1">Push Notifications</div>
                 <div class="text-sm text-slate-500">Receive push notifications</div>
             </div>
-            <Switch />
+            <input type="checkbox" class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600" />
         </div>
         <div class="flex justify-between items-center py-4">
             <div class="flex-1">
                 <div class="font-medium text-slate-800 mb-1">Weekly Reports</div>
                 <div class="text-sm text-slate-500">Get weekly summary reports</div>
             </div>
-            <Switch />
+            <input type="checkbox" class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600" />
         </div>
-    </Card>
+    </div>
 
-    <Card>
+    <div class="bg-white rounded-lg p-6 shadow">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Security</h3>
         <div class="mb-6">
             <label class="block mb-2 font-medium text-slate-600 text-sm">Current Password</label>
@@ -65,17 +65,17 @@
             <label class="block mb-2 font-medium text-slate-600 text-sm">Confirm Password</label>
             <input type="password" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-md text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100" placeholder="Confirm new password" />
         </div>
-        <Button Color="ButtonColor.Primary">Update Password</Button>
-    </Card>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update Password</button>
+    </div>
 
-    <Card>
+    <div class="bg-white rounded-lg p-6 shadow">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Appearance</h3>
         <div class="flex justify-between items-center py-4 border-b border-slate-200">
             <div class="flex-1">
                 <div class="font-medium text-slate-800 mb-1">Dark Mode</div>
                 <div class="text-sm text-slate-500">Switch to dark theme</div>
             </div>
-            <Switch />
+            <input type="checkbox" class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600" />
         </div>
         <div class="mb-6 mt-4">
             <label class="block mb-2 font-medium text-slate-600 text-sm">Language</label>
@@ -86,6 +86,6 @@
                 <option>German</option>
             </select>
         </div>
-        <Button Color="ButtonColor.Primary">Save Preferences</Button>
-    </Card>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Preferences</button>
+    </div>
 </div>

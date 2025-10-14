@@ -8,13 +8,13 @@
     <p class="text-slate-500">Manage and track customer orders</p>
 </div>
 
-<Card>
+<div class="bg-white rounded-lg p-6 shadow">
     <div class="flex justify-between items-center mb-6">
         <h3 class="text-lg font-semibold text-slate-800">Recent Orders</h3>
-        <Button Color="ButtonColor.Primary">New Order</Button>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">New Order</button>
     </div>
     
-    <Table>
+    <table class="w-full">
         <thead>
             <tr>
                 <th class="text-left px-3 py-3 border-b-2 border-slate-200 font-semibold text-slate-600 text-sm">Order ID</th>
@@ -31,7 +31,7 @@
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">John Doe</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Premium Package</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">$299.00</td>
-                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Success">Completed</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Completed</span></td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Oct 12, 2025</td>
             </tr>
             <tr>
@@ -39,7 +39,7 @@
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Jane Smith</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Standard Package</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">$149.00</td>
-                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Warning">Pending</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Pending</span></td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Oct 12, 2025</td>
             </tr>
             <tr>
@@ -47,7 +47,7 @@
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Bob Johnson</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Enterprise Package</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">$599.00</td>
-                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Info">Processing</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">Processing</span></td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Oct 11, 2025</td>
             </tr>
             <tr>
@@ -55,7 +55,7 @@
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Alice Brown</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Basic Package</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">$99.00</td>
-                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Success">Completed</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Completed</span></td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Oct 11, 2025</td>
             </tr>
             <tr>
@@ -63,9 +63,9 @@
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Charlie Wilson</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Premium Package</td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">$299.00</td>
-                <td class="px-3 py-3 border-b border-slate-200"><Badge Color="BadgeColor.Danger">Cancelled</Badge></td>
+                <td class="px-3 py-3 border-b border-slate-200"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">Cancelled</span></td>
                 <td class="px-3 py-3 border-b border-slate-200 text-slate-800">Oct 10, 2025</td>
             </tr>
         </tbody>
-    </Table>
-</Card>
+    </table>
+</div>
