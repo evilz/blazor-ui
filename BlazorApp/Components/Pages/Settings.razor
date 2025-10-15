@@ -16,7 +16,7 @@
         <CardContent>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <Input Label="Display Name" @bind-Value="displayName" TItem="string" />
-                <Input Label="Email" @bind-Value="email" TItem="string" InputType="InputType.Email" />
+                <Input Label="Email" @bind-Value="email" TItem="string" Type="email" />
                 <Input Label="Role" @bind-Value="role" TItem="string" Disabled="true" />
             </div>
         </CardContent>
@@ -60,9 +60,9 @@
         </CardHeader>
         <CardContent>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <Input Label="Current Password" @bind-Value="currentPassword" TItem="string" InputType="InputType.Password" Placeholder="Enter current password" />
-                <Input Label="New Password" @bind-Value="newPassword" TItem="string" InputType="InputType.Password" Placeholder="Enter new password" />
-                <Input Label="Confirm Password" @bind-Value="confirmPassword" TItem="string" InputType="InputType.Password" Placeholder="Confirm new password" />
+                <Input Label="Current Password" @bind-Value="currentPassword" TItem="string" Type="password" Placeholder="Enter current password" />
+                <Input Label="New Password" @bind-Value="newPassword" TItem="string" Type="password" Placeholder="Enter new password" />
+                <Input Label="Confirm Password" @bind-Value="confirmPassword" TItem="string" Type="password" Placeholder="Confirm new password" />
             </div>
         </CardContent>
         <CardFooter>

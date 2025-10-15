@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
 
 // Add Sysinfocus Simple/UI services
 builder.Services.AddScoped<StateManager>();
+builder.Services.AddScoped<BrowserExtensions>();
 
 var app = builder.Build();
 
