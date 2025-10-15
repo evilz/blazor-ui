@@ -2,8 +2,10 @@
 @inject NavigationManager Navigation
 
 <div class="dashboard-layout">
-    <Sidebar Items="@sideBarItems" Show="@showMenu" IsSimpleSideBar="@isSimple" Height="100%" OnMenuClick="HandleMenuClick"
-             HoverBackground="purple" HoverForeground="white">
+    @* Note: OnMenuClick parameter is not functional in Sysinfocus.AspNetCore.Components v0.0.3.4 *@
+    @* Navigation is handled via direct URL navigation by the Sidebar component *@
+    <Sidebar Items="@sideBarItems" Show="@showMenu" IsSimpleSideBar="@isSimple" Height="100%"
+             HoverBackground="purple" HoverForeground="white" Width="280px">
         <SidebarHeader>
             <h4 class="large g8 flex jcc mt1 mb05 pointer" @onclick="GotoHome">
                 <Icon Name="home" Size="32px" />
@@ -49,7 +51,7 @@
     private List<SideBarItem> sideBarItems = new();
 
     protected override void OnInitialized()
-    {
+    {        
         sideBarItems = new List<SideBarItem>
         {
             new SideBarItem("Main", 1, 0, "Main", null) { IsExpanded = true },
@@ -62,23 +64,16 @@
             new SideBarItem("Examples", 7, 0, "Examples", null) { IsExpanded = true },
             new SideBarItem("Examples", 8, 7, "Counter", "add_circle") { Url = "/counter" },
             new SideBarItem("Examples", 9, 7, "Weather", "wb_sunny") { Url = "/weather" },
+            new SideBarItem("Examples", 10, 7, "Sidebar Demo", "menu_open") { Url = "/sidebar-demo" },
             
-            new SideBarItem("Settings", 10, 0, "Settings", null) { IsExpanded = true },
-            new SideBarItem("Settings", 11, 10, "Settings", "settings") { Url = "/settings" }
+            new SideBarItem("Settings", 11, 0, "Settings", null) { IsExpanded = true },
+            new SideBarItem("Settings", 12, 11, "Settings", "settings") { Url = "/settings" }
         };
     }
 
     private void ToggleSidebar()
     {
         showMenu = !showMenu;
-    }
-
-    private void HandleMenuClick(SideBarItem item)
-    {
-        if (!string.IsNullOrEmpty(item.Url))
-        {
-            Navigation.NavigateTo(item.Url);
-        }
     }
 
     private void GotoHome()

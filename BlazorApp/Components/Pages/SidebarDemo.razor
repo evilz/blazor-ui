@@ -1,0 +1,91 @@
+@page "/sidebar-demo"
+@rendermode InteractiveServer
+
+<PageTitle>Sidebar Demo - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <h1>Sidebar Demo</h1>
+    <p>Demonstration of sidebar functionality</p>
+</div>
+
+<div style="display: flex; gap: 2rem;">
+    <Sidebar Items="@sideBarItems" Show="@sideBarVisible" IsSimpleSideBar="@sidebarType" Height="600px" 
+             OnMenuClick="HandleSidebarMenuClick" Width="280px"
+             HoverBackground="purple" HoverForeground="white">
+        <SidebarHeader>
+            <h4 style="text-align: center; margin: 1rem 0;">Menu</h4>
+        </SidebarHeader>
+    </Sidebar>
+
+    <div style="padding: 0.75rem 1rem; min-width: 400px; overflow: auto">
+
+        <Icon Name="dock_to_right" Size="20px" Style="margin-bottom: 3rem" Color="royalblue"
+            OnClick="@(() => sideBarVisible = !sideBarVisible)" Tooltip="Toggle Sidebar" />
+
+        @if (selectedMenu is not null) {
+            <p>You have selected: <h3>@selectedMenu.Name</h3></p>
+        } else if (selectedContextMenu is not null) {
+            <p>Context menu selected: <h3>@selectedContextMenu</h3></p>
+        }
+
+        <div class="flex mt1">
+            <Button Text="Switch Sidebar Type" Type="ButtonType.Secondary" OnClick="@(_ => sidebarType = !sidebarType)" />
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private bool sideBarVisible = true;
+    private bool sidebarType = false;
+    private SideBarItem? selectedMenu = null;
+    private string? selectedContextMenu = null;
+    private List<SideBarItem> sideBarItems = new();
+
+    protected override void OnInitialized()
+    {
+        sideBarItems = new List<SideBarItem>
+        {
+            new SideBarItem("Main", 1, 0, "Main Menu", null) { IsExpanded = true },
+            new SideBarItem("Main", 2, 1, "Dashboard", "home") { Url = "/" },
+            new SideBarItem("Main", 3, 1, "Analytics", "bar_chart") { Url = "/analytics" },
+            new SideBarItem("Main", 4, 1, "Orders", "shopping_cart") { Url = "/orders" },
+            
+            new SideBarItem("Settings", 5, 0, "Settings", null) { IsExpanded = true },
+            new SideBarItem("Settings", 6, 5, "Preferences", "settings") { Url = "/settings" }
+        };
+    }
+
+    private void HandleSidebarMenuClick(SideBarItem item)
+    {
+        selectedMenu = item;
+        Console.WriteLine($"Menu item clicked: {item.Name}");
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .flex {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .mt1 {
+        margin-top: 1rem;
+    }
+</style>
