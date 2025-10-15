@@ -9,86 +9,98 @@
 </div>
 
 <div class="settings-grid">
-    <div class="card">
-        <h3>Profile Settings</h3>
-        <div class="form-group">
-            <label>Display Name</label>
-            <input type="text" class="form-control" value="Admin User" />
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" value="admin@example.com" />
-        </div>
-        <div class="form-group">
-            <label>Role</label>
-            <input type="text" class="form-control" value="Administrator" disabled />
-        </div>
-        <button class="btn btn-primary">Save Changes</button>
-    </div>
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <h3>Profile Settings</h3>
+        </CardHeader>
+        <CardContent>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <Input Label="Display Name" @bind-Value="displayName" TItem="string" />
+                <Input Label="Email" @bind-Value="email" TItem="string" InputType="InputType.Email" />
+                <Input Label="Role" @bind-Value="role" TItem="string" Disabled="true" />
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Button Text="Save Changes" Style="width: 100%;" />
+        </CardFooter>
+    </Card>
 
-    <div class="card">
-        <h3>Notification Settings</h3>
-        <div class="setting-item">
-            <div class="setting-info">
-                <div class="setting-title">Email Notifications</div>
-                <div class="setting-description">Receive notifications via email</div>
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <h3>Notification Settings</h3>
+        </CardHeader>
+        <CardContent>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Email Notifications</div>
+                    <div class="setting-description">Receive notifications via email</div>
+                </div>
+                <input type="checkbox" class="form-check-input" />
             </div>
-            <input type="checkbox" class="form-check-input" />
-        </div>
-        <div class="setting-item">
-            <div class="setting-info">
-                <div class="setting-title">Push Notifications</div>
-                <div class="setting-description">Receive push notifications</div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Push Notifications</div>
+                    <div class="setting-description">Receive push notifications</div>
+                </div>
+                <input type="checkbox" class="form-check-input" />
             </div>
-            <input type="checkbox" class="form-check-input" />
-        </div>
-        <div class="setting-item">
-            <div class="setting-info">
-                <div class="setting-title">Weekly Reports</div>
-                <div class="setting-description">Get weekly summary reports</div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Weekly Reports</div>
+                    <div class="setting-description">Get weekly summary reports</div>
+                </div>
+                <input type="checkbox" class="form-check-input" />
             </div>
-            <input type="checkbox" class="form-check-input" />
-        </div>
-    </div>
+        </CardContent>
+    </Card>
 
-    <div class="card">
-        <h3>Security</h3>
-        <div class="form-group">
-            <label>Current Password</label>
-            <input type="password" class="form-control" placeholder="Enter current password" />
-        </div>
-        <div class="form-group">
-            <label>New Password</label>
-            <input type="password" class="form-control" placeholder="Enter new password" />
-        </div>
-        <div class="form-group">
-            <label>Confirm Password</label>
-            <input type="password" class="form-control" placeholder="Confirm new password" />
-        </div>
-        <button class="btn btn-primary">Update Password</button>
-    </div>
-
-    <div class="card">
-        <h3>Appearance</h3>
-        <div class="setting-item">
-            <div class="setting-info">
-                <div class="setting-title">Dark Mode</div>
-                <div class="setting-description">Switch to dark theme</div>
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <h3>Security</h3>
+        </CardHeader>
+        <CardContent>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <Input Label="Current Password" @bind-Value="currentPassword" TItem="string" InputType="InputType.Password" Placeholder="Enter current password" />
+                <Input Label="New Password" @bind-Value="newPassword" TItem="string" InputType="InputType.Password" Placeholder="Enter new password" />
+                <Input Label="Confirm Password" @bind-Value="confirmPassword" TItem="string" InputType="InputType.Password" Placeholder="Confirm new password" />
             </div>
-            <input type="checkbox" class="form-check-input" />
-        </div>
-        <div class="form-group">
-            <label>Language</label>
-            <select class="form-control">
-                <option>English</option>
-                <option>Spanish</option>
-                <option>French</option>
-                <option>German</option>
-            </select>
-        </div>
-        <button class="btn btn-primary">Save Preferences</button>
-    </div>
+        </CardContent>
+        <CardFooter>
+            <Button Text="Update Password" Style="width: 100%;" />
+        </CardFooter>
+    </Card>
+
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <h3>Appearance</h3>
+        </CardHeader>
+        <CardContent>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Dark Mode</div>
+                    <div class="setting-description">Switch to dark theme</div>
+                </div>
+                <input type="checkbox" class="form-check-input" />
+            </div>
+            <div style="margin-top: 1rem;">
+                <Input Label="Language" @bind-Value="language" TItem="string" />
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Button Text="Save Preferences" Style="width: 100%;" />
+        </CardFooter>
+    </Card>
 </div>
+
+@code {
+    private string displayName = "Admin User";
+    private string email = "admin@example.com";
+    private string role = "Administrator";
+    private string currentPassword = "";
+    private string newPassword = "";
+    private string confirmPassword = "";
+    private string language = "English";
+}
 
 <style>
     .page-header {
@@ -109,40 +121,8 @@
 
     .settings-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         gap: 1.5rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #475569;
-        font-size: 0.875rem;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 0.625rem 0.875rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        color: #1e293b;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .form-control:disabled {
-        background-color: #f1f5f9;
-        cursor: not-allowed;
     }
 
     .setting-item {
