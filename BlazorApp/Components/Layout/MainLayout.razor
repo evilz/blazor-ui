@@ -1,61 +1,19 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
 <div class="dashboard-layout">
-    <aside class="sidebar @(sideBarVisible ? "open" : "")">
-        <div class="sidebar-header">
-            <h2>Blazor UI</h2>
-        </div>
-        
-        <nav class="nav-menu">
-            <div class="nav-section">
-                <div class="nav-section-title">Main</div>
-                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                    <Icon Name="home" />
-                    <span class="nav-text">Dashboard</span>
-                </NavLink>
-                <NavLink class="nav-link" href="analytics">
-                    <Icon Name="bar_chart" />
-                    <span class="nav-text">Analytics</span>
-                </NavLink>
-                <NavLink class="nav-link" href="orders">
-                    <Icon Name="shopping_cart" />
-                    <span class="nav-text">Orders</span>
-                </NavLink>
-                <NavLink class="nav-link" href="products">
-                    <Icon Name="inventory_2" />
-                    <span class="nav-text">Products</span>
-                </NavLink>
-                <NavLink class="nav-link" href="customers">
-                    <Icon Name="group" />
-                    <span class="nav-text">Customers</span>
-                </NavLink>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Examples</div>
-                <NavLink class="nav-link" href="counter">
-                    <Icon Name="add_circle" />
-                    <span class="nav-text">Counter</span>
-                </NavLink>
-                <NavLink class="nav-link" href="weather">
-                    <Icon Name="wb_sunny" />
-                    <span class="nav-text">Weather</span>
-                </NavLink>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Settings</div>
-                <NavLink class="nav-link" href="settings">
-                    <Icon Name="settings" />
-                    <span class="nav-text">Settings</span>
-                </NavLink>
-            </div>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <small>v1.0.0</small>
-        </div>
-    </aside>
+    <Sidebar Items="@sideBarItems" Show="@showMenu" IsSimpleSideBar="@isSimple" Height="100%" OnMenuClick="HandleMenuClick"
+             HoverBackground="purple" HoverForeground="white">
+        <SidebarHeader>
+            <h4 class="large g8 flex jcc mt1 mb05 pointer" @onclick="GotoHome">
+                <Icon Name="home" Size="32px" />
+                Blazor UI
+            </h4>
+        </SidebarHeader>
+        <SidebarFooter>
+            <small class="muted-color flex jcc mt05 mb05" style="font-size:0.7rem">&copy; 2025, Blazor UI Template.</small>
+        </SidebarFooter>
+    </Sidebar>
 
     <div class="main-content">
         <header class="top-bar">
@@ -86,10 +44,45 @@
 </div>
 
 @code {
-    private bool sideBarVisible = true;
+    private bool showMenu = true;
+    private bool isSimple = false;
+    private List<SideBarItem> sideBarItems = new();
+
+    protected override void OnInitialized()
+    {
+        sideBarItems = new List<SideBarItem>
+        {
+            new SideBarItem("Main", 1, 0, "Main", null) { IsExpanded = true },
+            new SideBarItem("Main", 2, 1, "Dashboard", "home") { Url = "/" },
+            new SideBarItem("Main", 3, 1, "Analytics", "bar_chart") { Url = "/analytics" },
+            new SideBarItem("Main", 4, 1, "Orders", "shopping_cart") { Url = "/orders" },
+            new SideBarItem("Main", 5, 1, "Products", "inventory_2") { Url = "/products" },
+            new SideBarItem("Main", 6, 1, "Customers", "group") { Url = "/customers" },
+            
+            new SideBarItem("Examples", 7, 0, "Examples", null) { IsExpanded = true },
+            new SideBarItem("Examples", 8, 7, "Counter", "add_circle") { Url = "/counter" },
+            new SideBarItem("Examples", 9, 7, "Weather", "wb_sunny") { Url = "/weather" },
+            
+            new SideBarItem("Settings", 10, 0, "Settings", null) { IsExpanded = true },
+            new SideBarItem("Settings", 11, 10, "Settings", "settings") { Url = "/settings" }
+        };
+    }
 
     private void ToggleSidebar()
     {
-        sideBarVisible = !sideBarVisible;
+        showMenu = !showMenu;
+    }
+
+    private void HandleMenuClick(SideBarItem item)
+    {
+        if (!string.IsNullOrEmpty(item.Url))
+        {
+            Navigation.NavigateTo(item.Url);
+        }
+    }
+
+    private void GotoHome()
+    {
+        Navigation.NavigateTo("/");
     }
 }
