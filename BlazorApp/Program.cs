@@ -8,6 +8,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Add Sysinfocus Simple/UI services
+builder.Services.AddSysinfocus();
+
 builder.Services.AddScoped<StateManager>();
 builder.Services.AddScoped<BrowserExtensions>();
 
