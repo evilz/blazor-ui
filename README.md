@@ -8,7 +8,9 @@ A modern Blazor .NET 9 project template inspired by [shadcn/ui dashboard](https:
 - 📱 Responsive design that works on mobile and desktop
 - 🎯 Multiple demo pages showcasing different UI components
 - ⚡ Built with Blazor .NET 9 and interactive server components
-- 🎭 Clean and professional styling inspired by shadcn/ui
+- 🎭 Clean and professional styling using Simple-UI components
+- 🧩 Uses Card, Input, Button, and Icon components from Sysinfocus Simple/UI
+- 🚀 No Bootstrap or Tailwind CSS dependencies
 
 ## Pages Included
 
@@ -42,15 +44,14 @@ Navigate to `http://localhost:5005` in your browser.
 BlazorApp/
 ├── Components/
 │   ├── Layout/
-│   │   ├── MainLayout.razor      # Main dashboard layout
-│   │   └── NavMenu.razor         # Sidebar navigation
+│   │   └── MainLayout.razor      # Main dashboard layout with integrated sidebar
 │   └── Pages/
-│       ├── Home.razor            # Dashboard page
-│       ├── Analytics.razor       # Analytics page
-│       ├── Orders.razor          # Orders page
-│       ├── Products.razor        # Products page
-│       ├── Customers.razor       # Customers page
-│       └── Settings.razor        # Settings page
+│       ├── Home.razor            # Dashboard page (Simple-UI Card)
+│       ├── Analytics.razor       # Analytics page (Simple-UI Card)
+│       ├── Orders.razor          # Orders page (Simple-UI Card, Button)
+│       ├── Products.razor        # Products page (Simple-UI Card, Button)
+│       ├── Customers.razor       # Customers page (Simple-UI Card, Button)
+│       └── Settings.razor        # Settings page (Simple-UI Card, Input, Button)
 ├── wwwroot/                      # Static files
 └── Program.cs                    # Application entry point
 ```
@@ -58,9 +59,13 @@ BlazorApp/
 ## Technology Stack
 
 - **Framework**: Blazor .NET 9
-- **Components**: Sysinfocus Simple/UI
+- **Components**: [Sysinfocus Simple/UI](https://blazor.art/Tools/Simple-UI) v0.0.3.4
+  - Card, CardHeader, CardContent, CardFooter
+  - Button
+  - Input
+  - Icon (Material Symbols)
 - **Styling**: Custom CSS with modern design principles
-- **Icons**: Emoji icons for simplicity
+- **Icons**: Material Symbols Outlined for UI icons, Emoji icons for content
 
 ## License
 

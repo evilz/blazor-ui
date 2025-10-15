@@ -1,17 +1,66 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="dashboard-layout">
-    <aside class="sidebar">
+    <aside class="sidebar @(sideBarVisible ? "open" : "")">
         <div class="sidebar-header">
             <h2>Blazor UI</h2>
         </div>
-        <NavMenu />
+        
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <Icon Name="home" />
+                    <span class="nav-text">Dashboard</span>
+                </NavLink>
+                <NavLink class="nav-link" href="analytics">
+                    <Icon Name="bar_chart" />
+                    <span class="nav-text">Analytics</span>
+                </NavLink>
+                <NavLink class="nav-link" href="orders">
+                    <Icon Name="shopping_cart" />
+                    <span class="nav-text">Orders</span>
+                </NavLink>
+                <NavLink class="nav-link" href="products">
+                    <Icon Name="inventory_2" />
+                    <span class="nav-text">Products</span>
+                </NavLink>
+                <NavLink class="nav-link" href="customers">
+                    <Icon Name="group" />
+                    <span class="nav-text">Customers</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Examples</div>
+                <NavLink class="nav-link" href="counter">
+                    <Icon Name="add_circle" />
+                    <span class="nav-text">Counter</span>
+                </NavLink>
+                <NavLink class="nav-link" href="weather">
+                    <Icon Name="wb_sunny" />
+                    <span class="nav-text">Weather</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                <NavLink class="nav-link" href="settings">
+                    <Icon Name="settings" />
+                    <span class="nav-text">Settings</span>
+                </NavLink>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <small>v1.0.0</small>
+        </div>
     </aside>
 
     <div class="main-content">
         <header class="top-bar">
             <div class="top-bar-left">
-                <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+                <button class="menu-toggle" @onclick="ToggleSidebar">
                     ☰
                 </button>
                 <h1 class="page-title">Dashboard</h1>
@@ -35,3 +84,12 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private bool sideBarVisible = true;
+
+    private void ToggleSidebar()
+    {
+        sideBarVisible = !sideBarVisible;
+    }
+}

@@ -9,74 +9,103 @@
 </div>
 
 <div class="analytics-grid">
-    <div class="card">
-        <h3>Page Views</h3>
-        <p class="metric-value">125,432</p>
-        <div class="metric-trend">
-            <span class="trend-indicator up">↑ 12.5%</span>
-            <span class="trend-period">vs last week</span>
-        </div>
-    </div>
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <h3>Page Views</h3>
+        </CardHeader>
+        <CardContent>
+            <p class="metric-value">125,432</p>
+            <div class="metric-trend">
+                <span class="trend-indicator up">↑ 12.5%</span>
+                <span class="trend-period">vs last week</span>
+            </div>
+        </CardContent>
+    </Card>
 
-    <div class="card">
-        <h3>Unique Visitors</h3>
-        <p class="metric-value">45,231</p>
-        <div class="metric-trend">
-            <span class="trend-indicator up">↑ 8.2%</span>
-            <span class="trend-period">vs last week</span>
-        </div>
-    </div>
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <h3>Unique Visitors</h3>
+        </CardHeader>
+        <CardContent>
+            <p class="metric-value">45,231</p>
+            <div class="metric-trend">
+                <span class="trend-indicator up">↑ 8.2%</span>
+                <span class="trend-period">vs last week</span>
+            </div>
+        </CardContent>
+    </Card>
 
-    <div class="card">
-        <h3>Bounce Rate</h3>
-        <p class="metric-value">34.5%</p>
-        <div class="metric-trend">
-            <span class="trend-indicator down">↓ 2.1%</span>
-            <span class="trend-period">vs last week</span>
-        </div>
-    </div>
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <h3>Bounce Rate</h3>
+        </CardHeader>
+        <CardContent>
+            <p class="metric-value">34.5%</p>
+            <div class="metric-trend">
+                <span class="trend-indicator down">↓ 2.1%</span>
+                <span class="trend-period">vs last week</span>
+            </div>
+        </CardContent>
+    </Card>
 
-    <div class="card">
-        <h3>Avg. Session Duration</h3>
-        <p class="metric-value">3m 45s</p>
-        <div class="metric-trend">
-            <span class="trend-indicator up">↑ 15.3%</span>
-            <span class="trend-period">vs last week</span>
-        </div>
-    </div>
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <h3>Avg. Session Duration</h3>
+        </CardHeader>
+        <CardContent>
+            <p class="metric-value">3m 45s</p>
+            <div class="metric-trend">
+                <span class="trend-indicator up">↑ 15.3%</span>
+                <span class="trend-period">vs last week</span>
+            </div>
+        </CardContent>
+    </Card>
 </div>
 
 <div class="analytics-details">
-    <div class="card">
-        <h3>Top Pages</h3>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Page</th>
-                    <th>Views</th>
-                    <th>Avg. Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>/dashboard</td>
-                    <td>12,543</td>
-                    <td>2m 15s</td>
-                </tr>
-                <tr>
-                    <td>/products</td>
-                    <td>8,234</td>
-                    <td>3m 30s</td>
-                </tr>
-                <tr>
-                    <td>/orders</td>
-                    <td>5,432</td>
-                    <td>1m 45s</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <Card>
+        <CardHeader>
+            <h3>Top Pages</h3>
+        </CardHeader>
+        <CardContent>
+            <table class="simple-table">
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Views</th>
+                        <th>Avg. Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var stat in pageStats)
+                    {
+                        <tr>
+                            <td>@stat.Path</td>
+                            <td>@stat.Views</td>
+                            <td>@stat.AvgTime</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </CardContent>
+    </Card>
 </div>
+
+@code {
+    private List<PageStat> pageStats = new()
+    {
+        new PageStat { Path = "/dashboard", Views = "12,543", AvgTime = "2m 15s" },
+        new PageStat { Path = "/products", Views = "8,234", AvgTime = "3m 30s" },
+        new PageStat { Path = "/orders", Views = "5,432", AvgTime = "1m 45s" }
+    };
+
+    public class PageStat
+    {
+        public string Path { get; set; } = "";
+        public string Views { get; set; } = "";
+        public string AvgTime { get; set; } = "";
+    }
+}
 
 <style>
     .page-header {
@@ -137,13 +166,12 @@
         gap: 1.5rem;
     }
 
-    .data-table {
+    .simple-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 1rem;
     }
 
-    .data-table th {
+    .simple-table th {
         text-align: left;
         padding: 0.75rem;
         border-bottom: 2px solid #e2e8f0;
@@ -152,7 +180,7 @@
         font-size: 0.875rem;
     }
 
-    .data-table td {
+    .simple-table td {
         padding: 0.75rem;
         border-bottom: 1px solid #e2e8f0;
         color: #1e293b;

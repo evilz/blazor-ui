@@ -8,67 +8,74 @@
     <p>Manage and track customer orders</p>
 </div>
 
-<div class="card">
-    <div class="table-header">
-        <h3>Recent Orders</h3>
-        <button class="btn btn-primary">New Order</button>
-    </div>
-    
-    <table class="orders-table">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>#12345</td>
-                <td>John Doe</td>
-                <td>Premium Package</td>
-                <td>$299.00</td>
-                <td><span class="status-badge success">Completed</span></td>
-                <td>Oct 12, 2025</td>
-            </tr>
-            <tr>
-                <td>#12344</td>
-                <td>Jane Smith</td>
-                <td>Standard Package</td>
-                <td>$149.00</td>
-                <td><span class="status-badge warning">Pending</span></td>
-                <td>Oct 12, 2025</td>
-            </tr>
-            <tr>
-                <td>#12343</td>
-                <td>Bob Johnson</td>
-                <td>Enterprise Package</td>
-                <td>$599.00</td>
-                <td><span class="status-badge info">Processing</span></td>
-                <td>Oct 11, 2025</td>
-            </tr>
-            <tr>
-                <td>#12342</td>
-                <td>Alice Brown</td>
-                <td>Basic Package</td>
-                <td>$99.00</td>
-                <td><span class="status-badge success">Completed</span></td>
-                <td>Oct 11, 2025</td>
-            </tr>
-            <tr>
-                <td>#12341</td>
-                <td>Charlie Wilson</td>
-                <td>Premium Package</td>
-                <td>$299.00</td>
-                <td><span class="status-badge danger">Cancelled</span></td>
-                <td>Oct 10, 2025</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+<Card>
+    <CardHeader>
+        <div class="table-header">
+            <h3>Recent Orders</h3>
+            <Button Text="New Order" OnClick="@(() => {})" />
+        </div>
+    </CardHeader>
+    <CardContent>
+        <table class="simple-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in orders)
+                {
+                    <tr>
+                        <td>@order.OrderId</td>
+                        <td>@order.Customer</td>
+                        <td>@order.Product</td>
+                        <td>@order.Amount</td>
+                        <td><span class="status-badge @GetStatusClass(order.Status)">@order.Status</span></td>
+                        <td>@order.Date</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </CardContent>
+</Card>
+
+@code {
+    private List<Order> orders = new()
+    {
+        new Order { OrderId = "#12345", Customer = "John Doe", Product = "Premium Package", Amount = "$299.00", Status = "Completed", Date = "Oct 12, 2025" },
+        new Order { OrderId = "#12344", Customer = "Jane Smith", Product = "Standard Package", Amount = "$149.00", Status = "Pending", Date = "Oct 12, 2025" },
+        new Order { OrderId = "#12343", Customer = "Bob Johnson", Product = "Enterprise Package", Amount = "$599.00", Status = "Processing", Date = "Oct 11, 2025" },
+        new Order { OrderId = "#12342", Customer = "Alice Brown", Product = "Basic Package", Amount = "$99.00", Status = "Completed", Date = "Oct 11, 2025" },
+        new Order { OrderId = "#12341", Customer = "Charlie Wilson", Product = "Premium Package", Amount = "$299.00", Status = "Cancelled", Date = "Oct 10, 2025" }
+    };
+
+    private string GetStatusClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "completed" => "success",
+            "pending" => "warning",
+            "processing" => "info",
+            "cancelled" => "danger",
+            _ => ""
+        };
+    }
+
+    public class Order
+    {
+        public string OrderId { get; set; } = "";
+        public string Customer { get; set; } = "";
+        public string Product { get; set; } = "";
+        public string Amount { get; set; } = "";
+        public string Status { get; set; } = "";
+        public string Date { get; set; } = "";
+    }
+}
 
 <style>
     .page-header {
@@ -91,7 +98,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        width: 100%;
     }
 
     .table-header h3 {
@@ -101,12 +108,12 @@
         color: #1e293b;
     }
 
-    .orders-table {
+    .simple-table {
         width: 100%;
         border-collapse: collapse;
     }
 
-    .orders-table th {
+    .simple-table th {
         text-align: left;
         padding: 0.75rem;
         border-bottom: 2px solid #e2e8f0;
@@ -115,7 +122,7 @@
         font-size: 0.875rem;
     }
 
-    .orders-table td {
+    .simple-table td {
         padding: 0.75rem;
         border-bottom: 1px solid #e2e8f0;
         color: #1e293b;

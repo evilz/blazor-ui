@@ -8,86 +8,65 @@
     <p>Manage your customer relationships</p>
 </div>
 
-<div class="card">
-    <div class="table-header">
-        <h3>Customer List</h3>
-        <button class="btn btn-primary">Add Customer</button>
-    </div>
-    
-    <table class="customers-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Company</th>
-                <th>Status</th>
-                <th>Joined</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">JD</div>
-                        <span>John Doe</span>
-                    </div>
-                </td>
-                <td>john.doe@example.com</td>
-                <td>Acme Corp</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>Jan 15, 2025</td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">JS</div>
-                        <span>Jane Smith</span>
-                    </div>
-                </td>
-                <td>jane.smith@example.com</td>
-                <td>Tech Solutions</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>Feb 22, 2025</td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">BJ</div>
-                        <span>Bob Johnson</span>
-                    </div>
-                </td>
-                <td>bob.johnson@example.com</td>
-                <td>Digital Ventures</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>Mar 10, 2025</td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">AB</div>
-                        <span>Alice Brown</span>
-                    </div>
-                </td>
-                <td>alice.brown@example.com</td>
-                <td>Innovation Labs</td>
-                <td><span class="status-badge inactive">Inactive</span></td>
-                <td>Apr 5, 2025</td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="customer-name">
-                        <div class="avatar">CW</div>
-                        <span>Charlie Wilson</span>
-                    </div>
-                </td>
-                <td>charlie.wilson@example.com</td>
-                <td>Global Systems</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>May 18, 2025</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+<Card>
+    <CardHeader>
+        <div class="table-header">
+            <h3>Customer List</h3>
+            <Button Text="Add Customer" OnClick="@(() => {})" />
+        </div>
+    </CardHeader>
+    <CardContent>
+        <table class="simple-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var customer in customers)
+                {
+                    <tr>
+                        <td>
+                            <div class="customer-name">
+                                <div class="avatar">@customer.Initials</div>
+                                <span>@customer.Name</span>
+                            </div>
+                        </td>
+                        <td>@customer.Email</td>
+                        <td>@customer.Company</td>
+                        <td><span class="status-badge @(customer.IsActive ? "active" : "inactive")">@(customer.IsActive ? "Active" : "Inactive")</span></td>
+                        <td>@customer.JoinedDate</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </CardContent>
+</Card>
+
+@code {
+    private List<Customer> customers = new()
+    {
+        new Customer { Initials = "JD", Name = "John Doe", Email = "john.doe@example.com", Company = "Acme Corp", IsActive = true, JoinedDate = "Jan 15, 2025" },
+        new Customer { Initials = "JS", Name = "Jane Smith", Email = "jane.smith@example.com", Company = "Tech Solutions", IsActive = true, JoinedDate = "Feb 22, 2025" },
+        new Customer { Initials = "BJ", Name = "Bob Johnson", Email = "bob.johnson@example.com", Company = "Digital Ventures", IsActive = true, JoinedDate = "Mar 10, 2025" },
+        new Customer { Initials = "AB", Name = "Alice Brown", Email = "alice.brown@example.com", Company = "Innovation Labs", IsActive = false, JoinedDate = "Apr 5, 2025" },
+        new Customer { Initials = "CW", Name = "Charlie Wilson", Email = "charlie.wilson@example.com", Company = "Global Systems", IsActive = true, JoinedDate = "May 18, 2025" }
+    };
+
+    public class Customer
+    {
+        public string Initials { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Company { get; set; } = "";
+        public bool IsActive { get; set; }
+        public string JoinedDate { get; set; } = "";
+    }
+}
 
 <style>
     .page-header {
@@ -110,7 +89,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        width: 100%;
     }
 
     .table-header h3 {
@@ -120,12 +99,12 @@
         color: #1e293b;
     }
 
-    .customers-table {
+    .simple-table {
         width: 100%;
         border-collapse: collapse;
     }
 
-    .customers-table th {
+    .simple-table th {
         text-align: left;
         padding: 0.75rem;
         border-bottom: 2px solid #e2e8f0;
@@ -134,7 +113,7 @@
         font-size: 0.875rem;
     }
 
-    .customers-table td {
+    .simple-table td {
         padding: 0.75rem;
         border-bottom: 1px solid #e2e8f0;
         color: #1e293b;
