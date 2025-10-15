@@ -5,19 +5,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    
+    <link rel="icon" type="image/png" href="favicon.png" />
+    
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["BlazorApp.styles.css"]" />
-    <link href="_content/Sysinfocus.AspNetCore.Components/css/styles.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="@Assets["_content/Sysinfocus.AspNetCore.Components/styles.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Sysinfocus.AspNetCore.Components/Sysinfocus.AspNetCore.Components.bundle.scp.css"]" />
     <ImportMap />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <HeadOutlet />
+    <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
 <body>
-    <Routes />
+    <Routes  @rendermode="InteractiveServer" /> />
     <script src="_framework/blazor.web.js"></script>
-    <script src="_content/Sysinfocus.AspNetCore.Components/js/scripts.js"></script>
 </body>
 
 </html>
