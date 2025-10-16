@@ -9,12 +9,17 @@
 </div>
 
 <div class="dashboard-grid">
-    <Card Style="min-width: 250px;">
-        <CardHeader>
-            <h3>Total Revenue</h3>
+    <Card  Style="min-width: 250px;">
+        <CardHeader >
+            <div class="flex-row flex justify-between" style="justify-content: space-between;">
+                
+                <p>Total Revenue</p>
+                <Badge Text="📉 -20%" Type="BadgeType.Outline" />
+            </div>
+            
         </CardHeader>
         <CardContent>
-            <p class="stat-value">$45,231.89</p>
+            <p class="text-2xl font-semibold tabular-nums @@[250px]/card:text-3xl">$45,231.89</p>
             <p class="stat-change positive">+20.1% from last month</p>
         </CardContent>
     </Card>
@@ -113,12 +118,12 @@
         margin-bottom: 2rem;
     }
 
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0 0 0.5rem 0;
-    }
+    /*.stat-value {*/
+    /*    font-size: 2rem;*/
+    /*    font-weight: 700;*/
+    /*    color: #1e293b;*/
+    /*    margin: 0 0 0.5rem 0;*/
+    /*}*/
 
     .stat-change {
         font-size: 0.875rem;
