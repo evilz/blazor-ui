@@ -4,6 +4,7 @@
 <PageTitle>Orders - Blazor UI</PageTitle>
 
 <div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
     <h1>Orders</h1>
     <p>Manage and track customer orders</p>
 </div>
@@ -45,6 +46,7 @@
 </Card>
 
 @code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
     private List<Order> orders = new()
     {
         new Order { OrderId = "#12345", Customer = "John Doe", Product = "Premium Package", Amount = "$299.00", Status = "Completed", Date = "Oct 12, 2025" },
@@ -53,6 +55,15 @@
         new Order { OrderId = "#12342", Customer = "Alice Brown", Product = "Basic Package", Amount = "$99.00", Status = "Completed", Date = "Oct 11, 2025" },
         new Order { OrderId = "#12341", Customer = "Charlie Wilson", Product = "Premium Package", Amount = "$299.00", Status = "Cancelled", Date = "Oct 10, 2025" }
     };
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Orders") { Url = "/orders" }
+        };
+    }
 
     private string GetStatusClass(string status)
     {

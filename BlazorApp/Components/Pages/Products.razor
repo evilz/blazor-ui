@@ -4,6 +4,7 @@
 <PageTitle>Products - Blazor UI</PageTitle>
 
 <div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
     <h1>Products</h1>
     <p>Manage your product catalog</p>
 </div>
@@ -86,6 +87,19 @@
         </CardFooter>
     </Card>
 </div>
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Products") { Url = "/products" }
+        };
+    }
+}
 
 <style>
     .page-header {

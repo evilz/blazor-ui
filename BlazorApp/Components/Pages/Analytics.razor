@@ -4,6 +4,7 @@
 <PageTitle>Analytics - Blazor UI</PageTitle>
 
 <div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
     <h1>Analytics</h1>
     <p>Track your performance metrics</p>
 </div>
@@ -92,12 +93,22 @@
 </div>
 
 @code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
     private List<PageStat> pageStats = new()
     {
         new PageStat { Path = "/dashboard", Views = "12,543", AvgTime = "2m 15s" },
         new PageStat { Path = "/products", Views = "8,234", AvgTime = "3m 30s" },
         new PageStat { Path = "/orders", Views = "5,432", AvgTime = "1m 45s" }
     };
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Analytics") { Url = "/analytics" }
+        };
+    }
 
     public class PageStat
     {
