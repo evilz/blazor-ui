@@ -4,6 +4,7 @@
 <PageTitle>Customers - Blazor UI</PageTitle>
 
 <div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
     <h1>Customers</h1>
     <p>Manage your customer relationships</p>
 </div>
@@ -32,7 +33,7 @@
                     <tr>
                         <td>
                             <div class="customer-name">
-                                <div class="avatar">@customer.Initials</div>
+                                <Avatar Name="@customer.Name" ImageUrl="" />
                                 <span>@customer.Name</span>
                             </div>
                         </td>
@@ -48,6 +49,7 @@
 </Card>
 
 @code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
     private List<Customer> customers = new()
     {
         new Customer { Initials = "JD", Name = "John Doe", Email = "john.doe@example.com", Company = "Acme Corp", IsActive = true, JoinedDate = "Jan 15, 2025" },
@@ -56,6 +58,15 @@
         new Customer { Initials = "AB", Name = "Alice Brown", Email = "alice.brown@example.com", Company = "Innovation Labs", IsActive = false, JoinedDate = "Apr 5, 2025" },
         new Customer { Initials = "CW", Name = "Charlie Wilson", Email = "charlie.wilson@example.com", Company = "Global Systems", IsActive = true, JoinedDate = "May 18, 2025" }
     };
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Customers") { Url = "/customers" }
+        };
+    }
 
     public class Customer
     {
@@ -123,19 +134,6 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
-    }
-
-    .avatar {
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.875rem;
     }
 
     .status-badge {

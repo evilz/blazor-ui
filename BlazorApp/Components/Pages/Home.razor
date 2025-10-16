@@ -9,12 +9,17 @@
 </div>
 
 <div class="dashboard-grid">
-    <Card Style="min-width: 250px;">
-        <CardHeader>
-            <h3>Total Revenue</h3>
+    <Card  Style="min-width: 250px;">
+        <CardHeader >
+            <div class="flex-row flex justify-between" style="justify-content: space-between;">
+                
+                <p>Total Revenue</p>
+                <Badge Text="📉 -20%" Type="BadgeType.Outline" />
+            </div>
+            
         </CardHeader>
         <CardContent>
-            <p class="stat-value">$45,231.89</p>
+            <p class="text-2xl font-semibold tabular-nums @@[250px]/card:text-3xl">$45,231.89</p>
             <p class="stat-change positive">+20.1% from last month</p>
         </CardContent>
     </Card>
@@ -58,21 +63,27 @@
         <CardContent>
             <div class="activity-list">
                 <div class="activity-item">
-                    <div class="activity-icon">📦</div>
+                    <div class="activity-icon">
+                        <Icon Name="shopping_bag" Size="24px" />
+                    </div>
                     <div class="activity-content">
                         <p class="activity-title">New order received</p>
                         <p class="activity-time">2 minutes ago</p>
                     </div>
                 </div>
                 <div class="activity-item">
-                    <div class="activity-icon">👤</div>
+                    <div class="activity-icon">
+                        <Icon Name="person_add" Size="24px" />
+                    </div>
                     <div class="activity-content">
                         <p class="activity-title">New customer registered</p>
                         <p class="activity-time">15 minutes ago</p>
                     </div>
                 </div>
                 <div class="activity-item">
-                    <div class="activity-icon">💰</div>
+                    <div class="activity-icon">
+                        <Icon Name="payments" Size="24px" />
+                    </div>
                     <div class="activity-content">
                         <p class="activity-title">Payment received</p>
                         <p class="activity-time">1 hour ago</p>
@@ -107,12 +118,12 @@
         margin-bottom: 2rem;
     }
 
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0 0 0.5rem 0;
-    }
+    /*.stat-value {*/
+    /*    font-size: 2rem;*/
+    /*    font-weight: 700;*/
+    /*    color: #1e293b;*/
+    /*    margin: 0 0 0.5rem 0;*/
+    /*}*/
 
     .stat-change {
         font-size: 0.875rem;
@@ -141,7 +152,6 @@
     }
 
     .activity-icon {
-        font-size: 1.5rem;
         background: #f1f5f9;
         width: 3rem;
         height: 3rem;
@@ -149,6 +159,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 0.5rem;
+        color: #475569;
     }
 
     .activity-content {
