@@ -1,0 +1,509 @@
+@page "/components"
+@rendermode InteractiveServer
+
+<PageTitle>Component Showcase - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Component Showcase</h1>
+    <p>Comprehensive demo of Simple-UI components</p>
+</div>
+
+<div class="showcase-grid">
+    <!-- User Profile Card with Avatar -->
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <div class="header-with-avatar">
+                <Avatar Name="John Doe" ImageUrl="" />
+                <div>
+                    <h3>User Profile</h3>
+                    <p style="margin: 0; color: #64748b; font-size: 0.875rem;">Active Account</p>
+                </div>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div class="profile-info">
+                <div class="info-row">
+                    <Icon Name="email" />
+                    <span>john.doe@example.com</span>
+                </div>
+                <div class="info-row">
+                    <Icon Name="phone" />
+                    <span>+1 234 567 8900</span>
+                </div>
+                <div class="info-row">
+                    <Icon Name="location_on" />
+                    <span>San Francisco, CA</span>
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Button Text="Edit Profile" OnClick="@(() => {})" />
+            <Button Text="Settings" OnClick="@(() => {})" />
+        </CardFooter>
+    </Card>
+
+    <!-- Form with Labels and Inputs -->
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <h3>Contact Form</h3>
+        </CardHeader>
+        <CardContent>
+            <div class="form-group">
+                <Label Text="Full Name" />
+                <Input @bind-Value="formData.Name" TItem="string" Placeholder="Enter your name" />
+            </div>
+            <div class="form-group">
+                <Label Text="Email Address" />
+                <Input @bind-Value="formData.Email" TItem="string" Type="email" Placeholder="your@email.com" />
+            </div>
+            <div class="form-group">
+                <Label Text="Phone Number" />
+                <Input @bind-Value="formData.Phone" TItem="string" Type="tel" Placeholder="+1 (555) 000-0000" />
+            </div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" @bind="formData.AcceptTerms" id="terms" class="form-check-input" />
+                    <Label Text="I accept the terms and conditions" For="terms" />
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" @bind="formData.Newsletter" id="newsletter" class="form-check-input" />
+                    <Label Text="Subscribe to newsletter" For="newsletter" />
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" @bind="formData.Updates" id="updates" class="form-check-input" />
+                    <Label Text="Receive product updates" For="updates" />
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Button Text="Submit" OnClick="@HandleSubmit" />
+        </CardFooter>
+    </Card>
+
+    <!-- Date Selection Card -->
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <div class="header-with-icon">
+                <Icon Name="calendar_today" />
+                <h3>Date Selection</h3>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div class="form-group">
+                <Label Text="Select Date" />
+                <Input @bind-Value="selectedDateString" TItem="string" Type="date" />
+            </div>
+            <div class="selected-date-info">
+                <Icon Name="event" />
+                <span>Selected: @selectedDateString</span>
+            </div>
+        </CardContent>
+    </Card>
+
+    <!-- Data Visualization Card -->
+    <Card Style="min-width: 350px; grid-column: span 2;">
+        <CardHeader>
+            <div class="header-with-icon">
+                <Icon Name="bar_chart" />
+                <h3>Sales Performance</h3>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div class="chart-placeholder">
+                <div class="chart-bars">
+                    <div class="chart-bar" style="height: 65%;"><span>65</span></div>
+                    <div class="chart-bar" style="height: 59%;"><span>59</span></div>
+                    <div class="chart-bar" style="height: 80%;"><span>80</span></div>
+                    <div class="chart-bar" style="height: 81%;"><span>81</span></div>
+                    <div class="chart-bar" style="height: 56%;"><span>56</span></div>
+                    <div class="chart-bar" style="height: 75%;"><span>75</span></div>
+                </div>
+                <div class="chart-labels">
+                    <span>Jan</span>
+                    <span>Feb</span>
+                    <span>Mar</span>
+                    <span>Apr</span>
+                    <span>May</span>
+                    <span>Jun</span>
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+
+    <!-- Team Members with Avatars -->
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <h3>Team Members</h3>
+        </CardHeader>
+        <CardContent>
+            <div class="team-list">
+                @foreach (var member in teamMembers)
+                {
+                    <div class="team-member">
+                        <Avatar Name="@member.Name" ImageUrl="" />
+                        <div class="member-info">
+                            <div class="member-name">@member.Name</div>
+                            <div class="member-role">@member.Role</div>
+                        </div>
+                        <input type="checkbox" @bind="member.IsSelected" class="form-check-input" />
+                    </div>
+                }
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Button Text="Invite Members" OnClick="@(() => {})" />
+        </CardFooter>
+    </Card>
+
+    <!-- Actions Card -->
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <div class="header-with-icon">
+                <Icon Name="apps" />
+                <h3>Quick Actions</h3>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div class="action-buttons">
+                <Button Text="New Document" OnClick="@(() => {})" Style="width: 100%;" />
+                <Button Text="Upload File" OnClick="@(() => {})" Style="width: 100%;" />
+                <Button Text="Share" OnClick="@(() => {})" Style="width: 100%;" />
+                <Button Text="Settings" OnClick="@(() => {})" Style="width: 100%;" />
+            </div>
+        </CardContent>
+    </Card>
+
+    <!-- Statistics Card -->
+    <Card Style="min-width: 350px; grid-column: span 2;">
+        <CardHeader>
+            <h3>Statistics Overview</h3>
+        </CardHeader>
+        <CardContent>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <Icon Name="trending_up" Style="color: #16a34a;" />
+                    <div>
+                        <div class="stat-value">+12.5%</div>
+                        <div class="stat-label">Growth</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <Icon Name="people" Style="color: #3b82f6;" />
+                    <div>
+                        <div class="stat-value">2,543</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <Icon Name="shopping_cart" Style="color: #f59e0b;" />
+                    <div>
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-label">Orders</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <Icon Name="attach_money" Style="color: #10b981;" />
+                    <div>
+                        <div class="stat-value">$45.2K</div>
+                        <div class="stat-label">Revenue</div>
+                    </div>
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+
+    <!-- Notifications Card -->
+    <Card Style="min-width: 350px;">
+        <CardHeader>
+            <div class="header-with-icon">
+                <Icon Name="notifications" />
+                <h3>Notifications</h3>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div class="notification-list">
+                @foreach (var notification in notifications)
+                {
+                    <div class="notification-item">
+                        <Avatar Name="@notification.From" ImageUrl="" />
+                        <div class="notification-content">
+                            <div class="notification-title">@notification.Title</div>
+                            <div class="notification-time">@notification.Time</div>
+                        </div>
+                        <input type="checkbox" @bind="notification.IsRead" class="form-check-input" />
+                    </div>
+                }
+            </div>
+        </CardContent>
+    </Card>
+</div>
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+    private FormData formData = new();
+    private string selectedDateString = DateTime.Now.ToString("yyyy-MM-dd");
+    
+    private List<TeamMember> teamMembers = new()
+    {
+        new TeamMember { Name = "Alice Johnson", Role = "Project Manager", IsSelected = true },
+        new TeamMember { Name = "Bob Smith", Role = "Developer", IsSelected = false },
+        new TeamMember { Name = "Carol White", Role = "Designer", IsSelected = true },
+        new TeamMember { Name = "David Brown", Role = "QA Engineer", IsSelected = false }
+    };
+
+    private List<Notification> notifications = new()
+    {
+        new Notification { From = "System", Title = "New update available", Time = "2 min ago", IsRead = false },
+        new Notification { From = "Admin", Title = "Maintenance scheduled", Time = "1 hour ago", IsRead = false },
+        new Notification { From = "Team", Title = "Meeting reminder", Time = "3 hours ago", IsRead = true }
+    };
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Components") { Url = "/components" }
+        };
+    }
+
+    private void HandleSubmit()
+    {
+        // Handle form submission
+    }
+
+    public class FormData
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public bool AcceptTerms { get; set; }
+        public bool Newsletter { get; set; }
+        public bool Updates { get; set; }
+    }
+
+    public class TeamMember
+    {
+        public string Name { get; set; } = "";
+        public string Role { get; set; } = "";
+        public bool IsSelected { get; set; }
+    }
+
+    public class Notification
+    {
+        public string From { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Time { get; set; } = "";
+        public bool IsRead { get; set; }
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0 0.25rem 0;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .showcase-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .header-with-avatar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header-with-icon {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .header-with-icon h3 {
+        margin: 0;
+    }
+
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #475569;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .selected-date-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: #f1f5f9;
+        border-radius: 0.5rem;
+        color: #475569;
+    }
+
+    .team-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .team-member {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+    }
+
+    .member-info {
+        flex: 1;
+    }
+
+    .member-name {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .member-role {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .notification-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .notification-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .notification-time {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .chart-placeholder {
+        padding: 1rem 0;
+    }
+
+    .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        height: 300px;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .chart-bar {
+        flex: 1;
+        background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+        border-radius: 0.25rem 0.25rem 0 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 0.5rem;
+        color: white;
+        font-weight: 600;
+        min-width: 40px;
+    }
+
+    .chart-labels {
+        display: flex;
+        justify-content: space-around;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .chart-labels span {
+        flex: 1;
+        text-align: center;
+    }
+</style>
