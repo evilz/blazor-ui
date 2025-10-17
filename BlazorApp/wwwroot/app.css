@@ -3,6 +3,10 @@
 body{transition:none !important}
 :not(input, textarea) { user-select: none }
 
+:focus-visible {
+    outline: -webkit-focus-ring-color auto 0px;
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;

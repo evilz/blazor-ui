@@ -9,15 +9,15 @@
     <p>Comprehensive demo of Simple-UI components</p>
 </div>
 
-<div class="showcase-grid">
+<Grid MinColWidth="350px" Gap="1rem">
     <!-- User Profile Card with Avatar -->
-    <Card Style="min-width: 350px;">
+    <Card >
         <CardHeader>
             <div class="header-with-avatar">
-                <Avatar Name="John Doe" ImageUrl="" />
+                <Avatar Name="John Doe" Background="seagreen"  />
                 <div>
                     <h3>User Profile</h3>
-                    <p style="margin: 0; color: #64748b; font-size: 0.875rem;">Active Account</p>
+                    <p >Active Account</p>
                 </div>
             </div>
         </CardHeader>
@@ -38,8 +38,10 @@
             </div>
         </CardContent>
         <CardFooter>
-            <Button Text="Edit Profile" OnClick="@(() => {})" />
-            <Button Text="Settings" OnClick="@(() => {})" />
+            <div class="flex jcsb" style="width: 100%; padding: 1.5rem; padding-top: 0">
+            <Button Text="Edit Profile"  Type="ButtonType.Outline" OnClick="@(() => { })"/>
+            <Button Text="Settings" OnClick="@(() => { })"/>
+            </div>
         </CardFooter>
     </Card>
 
@@ -92,12 +94,9 @@
         <CardContent>
             <div class="form-group">
                 <Label Text="Select Date" />
-                <Input @bind-Value="selectedDateString" TItem="string" Type="date" />
+                <DatePicker Class="min-w-full" Date="@date" DateChanged="x => date = x" Placeholder="Pick a date"  />
             </div>
-            <div class="selected-date-info">
-                <Icon Name="event" />
-                <span>Selected: @selectedDateString</span>
-            </div>
+        
         </CardContent>
     </Card>
 
@@ -237,12 +236,15 @@
             </div>
         </CardContent>
     </Card>
-</div>
+</Grid>
 
 @code {
     private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
     private FormData formData = new();
     private string selectedDateString = DateTime.Now.ToString("yyyy-MM-dd");
+    
+    private  DateTime? date, date1 = DateTime.Now;
+ 
     
     private List<TeamMember> teamMembers = new()
     {
