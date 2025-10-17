@@ -17,31 +17,20 @@
         </div>
     </CardHeader>
     <CardContent>
-        <table class="simple-table">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Product</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var order in orders)
-                {
-                    <tr>
-                        <td>@order.OrderId</td>
-                        <td>@order.Customer</td>
-                        <td>@order.Product</td>
-                        <td>@order.Amount</td>
-                        <td><span class="status-badge @GetStatusClass(order.Status)">@order.Status</span></td>
-                        <td>@order.Date</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <DataTable Items="orders" TItem="Order">
+            <DataColumns Context="order">
+                <DataTableColumn TItem="Order" Header="Order ID" Property="x => x.OrderId" />
+                <DataTableColumn TItem="Order" Header="Customer" Property="x => x.Customer" />
+                <DataTableColumn TItem="Order" Header="Product" Property="x => x.Product" />
+                <DataTableColumn TItem="Order" Header="Amount" Property="x => x.Amount" />
+                <DataTableColumn TItem="Order" Header="Status">
+                    <Template>
+                        <span class="status-badge @GetStatusClass(order.Status)">@order.Status</span>
+                    </Template>
+                </DataTableColumn>
+                <DataTableColumn TItem="Order" Header="Date" Property="x => x.Date" />
+            </DataColumns>
+        </DataTable>
     </CardContent>
 </Card>
 
@@ -116,26 +105,6 @@
         margin: 0;
         font-size: 1.125rem;
         font-weight: 600;
-        color: #1e293b;
-    }
-
-    .simple-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .simple-table th {
-        text-align: left;
-        padding: 0.75rem;
-        border-bottom: 2px solid #e2e8f0;
-        font-weight: 600;
-        color: #475569;
-        font-size: 0.875rem;
-    }
-
-    .simple-table td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #e2e8f0;
         color: #1e293b;
     }
 
