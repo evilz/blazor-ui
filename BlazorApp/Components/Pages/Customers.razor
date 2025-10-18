@@ -17,34 +17,26 @@
         </div>
     </CardHeader>
     <CardContent>
-        <table class="simple-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Company</th>
-                    <th>Status</th>
-                    <th>Joined</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var customer in customers)
-                {
-                    <tr>
-                        <td>
-                            <div class="customer-name">
-                                <Avatar Name="@customer.Name" ImageUrl="" />
-                                <span>@customer.Name</span>
-                            </div>
-                        </td>
-                        <td>@customer.Email</td>
-                        <td>@customer.Company</td>
-                        <td><span class="status-badge @(customer.IsActive ? "active" : "inactive")">@(customer.IsActive ? "Active" : "Inactive")</span></td>
-                        <td>@customer.JoinedDate</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <DataTable Items="customers" TItem="Customer">
+            <DataColumns Context="customer">
+                <DataTableColumn TItem="Customer" Header="Name">
+                    <Template>
+                        <div class="customer-name">
+                            <Avatar Name="@customer.Name" ImageUrl="" />
+                            <span>@customer.Name</span>
+                        </div>
+                    </Template>
+                </DataTableColumn>
+                <DataTableColumn TItem="Customer" Header="Email" Property="x => x.Email" />
+                <DataTableColumn TItem="Customer" Header="Company" Property="x => x.Company" />
+                <DataTableColumn TItem="Customer" Header="Status">
+                    <Template>
+                        <span class="status-badge @(customer.IsActive ? "active" : "inactive")">@(customer.IsActive ? "Active" : "Inactive")</span>
+                    </Template>
+                </DataTableColumn>
+                <DataTableColumn TItem="Customer" Header="Joined" Property="x => x.JoinedDate" />
+            </DataColumns>
+        </DataTable>
     </CardContent>
 </Card>
 
@@ -107,26 +99,6 @@
         margin: 0;
         font-size: 1.125rem;
         font-weight: 600;
-        color: #1e293b;
-    }
-
-    .simple-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .simple-table th {
-        text-align: left;
-        padding: 0.75rem;
-        border-bottom: 2px solid #e2e8f0;
-        font-weight: 600;
-        color: #475569;
-        font-size: 0.875rem;
-    }
-
-    .simple-table td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #e2e8f0;
         color: #1e293b;
     }
 

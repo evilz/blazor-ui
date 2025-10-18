@@ -69,25 +69,13 @@
             <h3>Top Pages</h3>
         </CardHeader>
         <CardContent>
-            <table class="simple-table">
-                <thead>
-                    <tr>
-                        <th>Page</th>
-                        <th>Views</th>
-                        <th>Avg. Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var stat in pageStats)
-                    {
-                        <tr>
-                            <td>@stat.Path</td>
-                            <td>@stat.Views</td>
-                            <td>@stat.AvgTime</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <DataTable Items="pageStats" TItem="PageStat">
+                <DataColumns>
+                    <DataTableColumn TItem="PageStat" Header="Page" Property="x => x.Path" />
+                    <DataTableColumn TItem="PageStat" Header="Views" Property="x => x.Views" />
+                    <DataTableColumn TItem="PageStat" Header="Avg. Time" Property="x => x.AvgTime" />
+                </DataColumns>
+            </DataTable>
         </CardContent>
     </Card>
 </div>
@@ -175,25 +163,5 @@
     .analytics-details {
         display: grid;
         gap: 1.5rem;
-    }
-
-    .simple-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .simple-table th {
-        text-align: left;
-        padding: 0.75rem;
-        border-bottom: 2px solid #e2e8f0;
-        font-weight: 600;
-        color: #475569;
-        font-size: 0.875rem;
-    }
-
-    .simple-table td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #e2e8f0;
-        color: #1e293b;
     }
 </style>

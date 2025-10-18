@@ -7,13 +7,41 @@
 
 <p role="status">Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<Button Text="Click me" OnClick="IncrementCount" />
+
+@if (countHistory.Any())
+{
+    <div style="margin-top: 2rem;">
+        <h3>Count History</h3>
+        <DataTable Items="countHistory" TItem="CountEntry">
+            <DataColumns>
+                <DataTableColumn TItem="CountEntry" Header="Timestamp" Property="x => x.Timestamp" />
+                <DataTableColumn TItem="CountEntry" Header="Count" Property="x => x.Count" />
+                <DataTableColumn TItem="CountEntry" Header="Action" Property="x => x.Action" />
+            </DataColumns>
+        </DataTable>
+    </div>
+}
 
 @code {
     private int currentCount = 0;
+    private List<CountEntry> countHistory = new();
 
     private void IncrementCount()
     {
         currentCount++;
+        countHistory.Add(new CountEntry 
+        { 
+            Timestamp = DateTime.Now.ToString("HH:mm:ss"),
+            Count = currentCount,
+            Action = "Incremented"
+        });
+    }
+
+    public class CountEntry
+    {
+        public string Timestamp { get; set; } = "";
+        public int Count { get; set; }
+        public string Action { get; set; } = "";
     }
 }
