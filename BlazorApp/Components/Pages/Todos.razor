@@ -1,0 +1,250 @@
+@page "/todos"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+@using BlazorApp.Services
+@inject IJsonPlaceholderService JsonPlaceholderService
+
+<PageTitle>Todos - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Todos</h1>
+    <p>Browse todos from JSONPlaceholder API</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading">Loading todos...</div>
+}
+else if (todos.Count == 0)
+{
+    <Card>
+        <CardContent>
+            <p>No todos found.</p>
+        </CardContent>
+    </Card>
+}
+else
+{
+    <div class="todos-container">
+        <div class="todos-stats">
+            <Card>
+                <CardContent>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon completed">
+                                <Icon Name="check_circle" Size="24px" />
+                            </div>
+                            <div>
+                                <p class="stat-value">@todos.Count(t => t.Completed)</p>
+                                <p class="stat-label">Completed</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon pending">
+                                <Icon Name="radio_button_unchecked" Size="24px" />
+                            </div>
+                            <div>
+                                <p class="stat-value">@todos.Count(t => !t.Completed)</p>
+                                <p class="stat-label">Pending</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon total">
+                                <Icon Name="format_list_bulleted" Size="24px" />
+                            </div>
+                            <div>
+                                <p class="stat-value">@todos.Count</p>
+                                <p class="stat-label">Total</p>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+        <div class="todos-list">
+            @foreach (var todo in todos.Take(50))
+            {
+                <Card>
+                    <CardContent>
+                        <div class="todo-item">
+                            <div class="todo-checkbox @(todo.Completed ? "completed" : "")">
+                                <Icon Name="@(todo.Completed ? "check_box" : "check_box_outline_blank")" Size="24px" />
+                            </div>
+                            <div class="todo-content">
+                                <p class="todo-title @(todo.Completed ? "completed" : "")">@todo.Title</p>
+                                <div class="todo-meta">
+                                    <Badge Text="@($"User {todo.UserId}")" Type="BadgeType.Secondary" />
+                                    <span class="todo-id">Todo #@todo.Id</span>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<Todo> todos = new();
+    private bool isLoading = true;
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Todos") { Url = "/todos" }
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            todos = await JsonPlaceholderService.GetTodosAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading todos: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+
+    .todos-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .todos-stats {
+        width: 100%;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .stat-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stat-icon.completed {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .stat-icon.pending {
+        background: #fef3c7;
+        color: #ca8a04;
+    }
+
+    .stat-icon.total {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .stat-value {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .stat-label {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .todos-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .todo-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .todo-checkbox {
+        color: #94a3b8;
+        flex-shrink: 0;
+    }
+
+    .todo-checkbox.completed {
+        color: #16a34a;
+    }
+
+    .todo-content {
+        flex: 1;
+    }
+
+    .todo-title {
+        margin: 0 0 0.5rem 0;
+        font-weight: 500;
+        color: #1e293b;
+        text-transform: capitalize;
+    }
+
+    .todo-title.completed {
+        text-decoration: line-through;
+        color: #94a3b8;
+    }
+
+    .todo-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .todo-id {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+</style>

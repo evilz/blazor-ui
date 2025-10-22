@@ -1,4 +1,5 @@
 using BlazorApp.Components;
+using BlazorApp.Services;
 using Sysinfocus.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,12 @@ builder.Services.AddSysinfocus();
 
 builder.Services.AddScoped<StateManager>();
 builder.Services.AddScoped<BrowserExtensions>();
+
+// Add HttpClient for JsonPlaceholder API
+// Note: Using mock service because external API access may be restricted
+// To use real API, uncomment the next line and comment out the mock service line
+// builder.Services.AddHttpClient<IJsonPlaceholderService, JsonPlaceholderService>();
+builder.Services.AddScoped<IJsonPlaceholderService, MockJsonPlaceholderService>();
 
 var app = builder.Build();
 

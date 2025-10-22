@@ -1,0 +1,188 @@
+@page "/users"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+@using BlazorApp.Services
+@inject IJsonPlaceholderService JsonPlaceholderService
+
+<PageTitle>Users - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Users</h1>
+    <p>Browse users from JSONPlaceholder API</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading">Loading users...</div>
+}
+else if (users.Count == 0)
+{
+    <Card>
+        <CardContent>
+            <p>No users found.</p>
+        </CardContent>
+    </Card>
+}
+else
+{
+    <div class="users-grid">
+        @foreach (var user in users)
+        {
+            <Card>
+                <CardHeader>
+                    <div class="user-header">
+                        <div class="user-avatar">
+                            <Icon Name="person" Size="32px" />
+                        </div>
+                        <div class="user-info">
+                            <h3>@user.Name</h3>
+                            <p class="username">@("@" + user.Username)</p>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <Icon Name="email" Size="18px" />
+                            <span>@user.Email</span>
+                        </div>
+                        <div class="detail-item">
+                            <Icon Name="phone" Size="18px" />
+                            <span>@user.Phone</span>
+                        </div>
+                        <div class="detail-item">
+                            <Icon Name="language" Size="18px" />
+                            <span>@user.Website</span>
+                        </div>
+                        @if (user.Address != null)
+                        {
+                            <div class="detail-item">
+                                <Icon Name="location_on" Size="18px" />
+                                <span>@user.Address.City</span>
+                            </div>
+                        }
+                        @if (user.Company != null)
+                        {
+                            <div class="detail-item">
+                                <Icon Name="business" Size="18px" />
+                                <span>@user.Company.Name</span>
+                            </div>
+                        }
+                    </div>
+                </CardContent>
+            </Card>
+        }
+    </div>
+}
+
+@code {
+    private List<User> users = new();
+    private bool isLoading = true;
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Users") { Url = "/users" }
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            users = await JsonPlaceholderService.GetUsersAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading users: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .user-header {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .user-avatar {
+        width: 3.5rem;
+        height: 3.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .user-info h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .username {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #475569;
+        font-size: 0.875rem;
+    }
+
+    .detail-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>

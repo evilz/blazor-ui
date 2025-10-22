@@ -1,0 +1,150 @@
+@page "/albums"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+@using BlazorApp.Services
+@inject IJsonPlaceholderService JsonPlaceholderService
+
+<PageTitle>Albums - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Albums</h1>
+    <p>Browse albums from JSONPlaceholder API</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading">Loading albums...</div>
+}
+else if (albums.Count == 0)
+{
+    <Card>
+        <CardContent>
+            <p>No albums found.</p>
+        </CardContent>
+    </Card>
+}
+else
+{
+    <div class="albums-grid">
+        @foreach (var album in albums.Take(50))
+        {
+            <Card>
+                <CardContent>
+                    <div class="album-card">
+                        <div class="album-icon">
+                            <Icon Name="photo_library" Size="48px" />
+                        </div>
+                        <h3>@album.Title</h3>
+                        <div class="album-meta">
+                            <Badge Text="@($"User {album.UserId}")" Type="BadgeType.Secondary" />
+                            <span class="album-id">Album #@album.Id</span>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button Text="View Photos" Icon="collections" Size="ButtonSize.Small" Style="width: 100%;" />
+                </CardFooter>
+            </Card>
+        }
+    </div>
+}
+
+@code {
+    private List<Album> albums = new();
+    private bool isLoading = true;
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Albums") { Url = "/albums" }
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            albums = await JsonPlaceholderService.GetAlbumsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading albums: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+
+    .albums-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .album-card {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .album-icon {
+        width: 5rem;
+        height: 5rem;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%);
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+    }
+
+    .album-card h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        text-transform: capitalize;
+        min-height: 3rem;
+    }
+
+    .album-meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .album-id {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+</style>

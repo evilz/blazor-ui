@@ -1,0 +1,163 @@
+@page "/photos"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+@using BlazorApp.Services
+@inject IJsonPlaceholderService JsonPlaceholderService
+
+<PageTitle>Photos - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Photos</h1>
+    <p>Browse photos from JSONPlaceholder API</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading">Loading photos...</div>
+}
+else if (photos.Count == 0)
+{
+    <Card>
+        <CardContent>
+            <p>No photos found.</p>
+        </CardContent>
+    </Card>
+}
+else
+{
+    <div class="photos-grid">
+        @foreach (var photo in photos.Take(50))
+        {
+            <Card>
+                <CardContent>
+                    <div class="photo-card">
+                        <div class="photo-image">
+                            <img src="@photo.ThumbnailUrl" alt="@photo.Title" />
+                        </div>
+                        <h4>@photo.Title</h4>
+                        <div class="photo-meta">
+                            <Badge Text="@($"Album {photo.AlbumId}")" Type="BadgeType.Outline" />
+                            <span class="photo-id">Photo #@photo.Id</span>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button Text="View Full Size" Icon="open_in_new" Size="ButtonSize.Small" Style="width: 100%;" OnClick="() => OpenPhoto(photo.Url)" />
+                </CardFooter>
+            </Card>
+        }
+    </div>
+}
+
+@code {
+    private List<Photo> photos = new();
+    private bool isLoading = true;
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Photos") { Url = "/photos" }
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            photos = await JsonPlaceholderService.GetPhotosAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading photos: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenPhoto(string url)
+    {
+        // In a real application, you might want to open in a modal or new tab
+        Console.WriteLine($"Opening photo: {url}");
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .photo-card {
+        text-align: center;
+    }
+
+    .photo-image {
+        width: 100%;
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        background: #f1f5f9;
+    }
+
+    .photo-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-card h4 {
+        margin: 0 0 1rem 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1e293b;
+        text-transform: capitalize;
+        min-height: 2.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .photo-meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .photo-id {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+</style>
