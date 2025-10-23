@@ -1,0 +1,286 @@
+@page "/pricing"
+@rendermode InteractiveServer
+
+<PageTitle>Pricing - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Pricing Plans</h1>
+    <p>Choose the perfect plan for your needs</p>
+</div>
+
+<div class="pricing-container">
+    <div class="pricing-grid">
+        <!-- Free Plan -->
+        <Card Style="min-width: 320px;">
+            <CardHeader>
+                <div class="pricing-header">
+                    <h3 class="plan-name">Free</h3>
+                    <p class="plan-description">Perfect for getting started</p>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="pricing-content">
+                    <div class="price-section">
+                        <span class="price">$0</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <ul class="features-list">
+                        <li><span class="feature-icon">✓</span> Up to 3 projects</li>
+                        <li><span class="feature-icon">✓</span> Basic support</li>
+                        <li><span class="feature-icon">✓</span> 1 GB storage</li>
+                        <li><span class="feature-icon">✓</span> Community access</li>
+                        <li class="feature-disabled"><span class="feature-icon">✗</span> Advanced analytics</li>
+                        <li class="feature-disabled"><span class="feature-icon">✗</span> Priority support</li>
+                    </ul>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button Text="Get Started" Style="width: 100%;" Type="ButtonType.Outline" />
+            </CardFooter>
+        </Card>
+
+        <!-- Starter Plan -->
+        <Card Style="min-width: 320px;">
+            <CardHeader>
+                <div class="pricing-header">
+                    <h3 class="plan-name">Starter</h3>
+                    <p class="plan-description">Best for small teams</p>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="pricing-content">
+                    <div class="price-section">
+                        <span class="price">$29</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <ul class="features-list">
+                        <li><span class="feature-icon">✓</span> Up to 10 projects</li>
+                        <li><span class="feature-icon">✓</span> Email support</li>
+                        <li><span class="feature-icon">✓</span> 10 GB storage</li>
+                        <li><span class="feature-icon">✓</span> Community access</li>
+                        <li><span class="feature-icon">✓</span> Basic analytics</li>
+                        <li class="feature-disabled"><span class="feature-icon">✗</span> Priority support</li>
+                    </ul>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button Text="Get Started" Style="width: 100%;" />
+            </CardFooter>
+        </Card>
+
+        <!-- Pro Plan (Popular) -->
+        <Card Style="min-width: 320px; border: 2px solid #3b82f6;">
+            <CardHeader>
+                <div class="pricing-header">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3 class="plan-name">Pro</h3>
+                    <p class="plan-description">Perfect for growing businesses</p>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="pricing-content">
+                    <div class="price-section">
+                        <span class="price">$79</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <ul class="features-list">
+                        <li><span class="feature-icon">✓</span> Unlimited projects</li>
+                        <li><span class="feature-icon">✓</span> Priority email support</li>
+                        <li><span class="feature-icon">✓</span> 100 GB storage</li>
+                        <li><span class="feature-icon">✓</span> Community access</li>
+                        <li><span class="feature-icon">✓</span> Advanced analytics</li>
+                        <li><span class="feature-icon">✓</span> Custom integrations</li>
+                    </ul>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button Text="Get Started" Style="width: 100%;" Type="ButtonType.Primary" />
+            </CardFooter>
+        </Card>
+
+        <!-- Enterprise Plan -->
+        <Card Style="min-width: 320px;">
+            <CardHeader>
+                <div class="pricing-header">
+                    <h3 class="plan-name">Enterprise</h3>
+                    <p class="plan-description">For large organizations</p>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="pricing-content">
+                    <div class="price-section">
+                        <span class="price">Custom</span>
+                    </div>
+                    <ul class="features-list">
+                        <li><span class="feature-icon">✓</span> Unlimited everything</li>
+                        <li><span class="feature-icon">✓</span> 24/7 phone & email support</li>
+                        <li><span class="feature-icon">✓</span> Unlimited storage</li>
+                        <li><span class="feature-icon">✓</span> Private community</li>
+                        <li><span class="feature-icon">✓</span> Advanced analytics</li>
+                        <li><span class="feature-icon">✓</span> Custom integrations</li>
+                        <li><span class="feature-icon">✓</span> Dedicated account manager</li>
+                        <li><span class="feature-icon">✓</span> SLA guarantee</li>
+                    </ul>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button Text="Contact Sales" Style="width: 100%;" Type="ButtonType.Outline" />
+            </CardFooter>
+        </Card>
+    </div>
+</div>
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Pricing") { Url = "/pricing" }
+        };
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 1.125rem;
+        margin: 0;
+    }
+
+    .pricing-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .pricing-header {
+        position: relative;
+        text-align: center;
+        padding: 0.5rem 0;
+    }
+
+    .popular-badge {
+        position: absolute;
+        top: -0.5rem;
+        right: -0.5rem;
+        background: #3b82f6;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .plan-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+    }
+
+    .plan-description {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .pricing-content {
+        padding: 1rem 0;
+    }
+
+    .price-section {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .price {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1;
+    }
+
+    .price-period {
+        color: #64748b;
+        font-size: 1rem;
+        margin-left: 0.25rem;
+    }
+
+    .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .features-list li {
+        padding: 0.75rem 0;
+        color: #475569;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .features-list li.feature-disabled {
+        color: #cbd5e1;
+    }
+
+    .feature-icon {
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .features-list li:not(.feature-disabled) .feature-icon {
+        color: #10b981;
+    }
+
+    .features-list li.feature-disabled .feature-icon {
+        color: #cbd5e1;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .pricing-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+        }
+    }
+</style>
