@@ -74,6 +74,8 @@
     private List<Project> filteredProjects = new();
     private string selectedCategory = "All";
 
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+
     protected override void OnInitialized()
     {
         breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
@@ -215,10 +217,9 @@
             : projects.Where(p => p.Category == category).ToList();
     }
 
-    private void OpenUrl(string url)
+    private async Task OpenUrl(string url)
     {
-        // JavaScript interop would be needed to open URL in new tab
-        // For now, this is a placeholder
+        await JSRuntime.InvokeVoidAsync("open", url, "_blank");
     }
 }
 
