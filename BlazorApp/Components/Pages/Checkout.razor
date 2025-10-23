@@ -1,0 +1,500 @@
+@page "/checkout"
+@rendermode InteractiveServer
+
+<PageTitle>Checkout - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Checkout</h1>
+    <p>Complete your purchase</p>
+</div>
+
+<div class="checkout-container">
+    <!-- Left Column: Forms -->
+    <div class="checkout-forms">
+        <!-- Shipping Information -->
+        <Card Style="margin-bottom: 1.5rem;">
+            <CardHeader>
+                <h3>Shipping Information</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Email</label>
+                        <Input @bind-Value="email" Placeholder="you@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <Input @bind-Value="firstName" Placeholder="John" />
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <Input @bind-Value="lastName" Placeholder="Doe" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Address</label>
+                        <Input @bind-Value="address" Placeholder="123 Main St" />
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <Input @bind-Value="city" Placeholder="New York" />
+                    </div>
+                    <div class="form-group">
+                        <label>State</label>
+                        <Input @bind-Value="state" Placeholder="NY" />
+                    </div>
+                    <div class="form-group">
+                        <label>ZIP Code</label>
+                        <Input @bind-Value="zipCode" Placeholder="10001" />
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <Input @bind-Value="country" Placeholder="United States" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <!-- Payment Method -->
+        <Card Style="margin-bottom: 1.5rem;">
+            <CardHeader>
+                <h3>Payment Method</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="payment-options">
+                    <div class="payment-option @(paymentMethod == "card" ? "selected" : "")" @onclick='() => paymentMethod = "card"'>
+                        <Icon Name="credit_card" Size="24px" />
+                        <span>Credit Card</span>
+                    </div>
+                    <div class="payment-option @(paymentMethod == "paypal" ? "selected" : "")" @onclick='() => paymentMethod = "paypal"'>
+                        <Icon Name="account_balance_wallet" Size="24px" />
+                        <span>PayPal</span>
+                    </div>
+                    <div class="payment-option @(paymentMethod == "apple" ? "selected" : "")" @onclick='() => paymentMethod = "apple"'>
+                        <Icon Name="phone_iphone" Size="24px" />
+                        <span>Apple Pay</span>
+                    </div>
+                </div>
+
+                @if (paymentMethod == "card")
+                {
+                    <div class="form-grid" style="margin-top: 1.5rem;">
+                        <div class="form-group full-width">
+                            <label>Card Number</label>
+                            <Input @bind-Value="cardNumber" Placeholder="1234 5678 9012 3456" />
+                        </div>
+                        <div class="form-group">
+                            <label>Expiration Date</label>
+                            <Input @bind-Value="cardExpiry" Placeholder="MM/YY" />
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <Input @bind-Value="cardCvv" Placeholder="123" />
+                        </div>
+                    </div>
+                }
+            </CardContent>
+        </Card>
+
+        <!-- Billing Address -->
+        <Card>
+            <CardHeader>
+                <div class="billing-header">
+                    <h3>Billing Address</h3>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="sameAsShipping" @bind="sameAsShipping" />
+                        <label for="sameAsShipping">Same as shipping</label>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+                @if (!sameAsShipping)
+                {
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Address</label>
+                            <Input @bind-Value="billingAddress" Placeholder="123 Main St" />
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <Input @bind-Value="billingCity" Placeholder="New York" />
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <Input @bind-Value="billingState" Placeholder="NY" />
+                        </div>
+                        <div class="form-group">
+                            <label>ZIP Code</label>
+                            <Input @bind-Value="billingZipCode" Placeholder="10001" />
+                        </div>
+                        <div class="form-group">
+                            <label>Country</label>
+                            <Input @bind-Value="billingCountry" Placeholder="United States" />
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="muted-text">Using the same address as shipping</p>
+                }
+            </CardContent>
+        </Card>
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <div class="order-summary">
+        <Card>
+            <CardHeader>
+                <h3>Order Summary</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="order-items">
+                    @foreach (var item in orderItems)
+                    {
+                        <div class="order-item">
+                            <div class="item-details">
+                                <div class="item-icon">@item.Icon</div>
+                                <div>
+                                    <p class="item-name">@item.Name</p>
+                                    <p class="item-description">@item.Description</p>
+                                </div>
+                            </div>
+                            <div class="item-price">
+                                <p class="item-quantity">x @item.Quantity</p>
+                                <p class="item-total">$@item.Total.ToString("0.00")</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <Separator />
+
+                <div class="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span>$@subtotal.ToString("0.00")</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Shipping</span>
+                        <span>$@shipping.ToString("0.00")</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Tax</span>
+                        <span>$@tax.ToString("0.00")</span>
+                    </div>
+                    <Separator />
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span>$@total.ToString("0.00")</span>
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button Text="Place Order" Style="width: 100%;" OnClick="HandleCheckout" />
+            </CardFooter>
+        </Card>
+
+        <!-- Promo Code Section -->
+        <Card Style="margin-top: 1.5rem;">
+            <CardHeader>
+                <h3>Promo Code</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="promo-code-input">
+                    <Input @bind-Value="promoCode" Placeholder="Enter promo code" />
+                    <Button Text="Apply" OnClick="ApplyPromoCode" />
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+</div>
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    // Shipping Information
+    private string email = "";
+    private string firstName = "";
+    private string lastName = "";
+    private string address = "";
+    private string city = "";
+    private string state = "";
+    private string zipCode = "";
+    private string country = "";
+
+    // Payment
+    private string paymentMethod = "card";
+    private string cardNumber = "";
+    private string cardExpiry = "";
+    private string cardCvv = "";
+
+    // Billing
+    private bool sameAsShipping = true;
+    private string billingAddress = "";
+    private string billingCity = "";
+    private string billingState = "";
+    private string billingZipCode = "";
+    private string billingCountry = "";
+
+    // Promo
+    private string promoCode = "";
+
+    // Order Items
+    private List<OrderItem> orderItems = new();
+    private decimal subtotal = 0;
+    private decimal shipping = 15.00m;
+    private decimal tax = 0;
+    private decimal total = 0;
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Checkout") { Url = "/checkout" }
+        };
+
+        // Sample order items
+        orderItems = new List<OrderItem>
+        {
+            new OrderItem { Icon = "📦", Name = "Basic Package", Description = "Monthly subscription", Quantity = 1, Price = 99.00m },
+            new OrderItem { Icon = "🎯", Name = "Premium Features", Description = "Add-on pack", Quantity = 1, Price = 49.00m },
+            new OrderItem { Icon = "📱", Name = "Mobile App Access", Description = "iOS & Android", Quantity = 2, Price = 19.99m }
+        };
+
+        CalculateTotals();
+    }
+
+    private void CalculateTotals()
+    {
+        subtotal = orderItems.Sum(i => i.Total);
+        tax = subtotal * 0.08m; // 8% tax
+        total = subtotal + shipping + tax;
+    }
+
+    private void HandleCheckout()
+    {
+        // Handle checkout logic
+        Console.WriteLine("Processing checkout...");
+    }
+
+    private void ApplyPromoCode()
+    {
+        // Handle promo code logic
+        if (!string.IsNullOrWhiteSpace(promoCode))
+        {
+            Console.WriteLine($"Applying promo code: {promoCode}");
+        }
+    }
+
+    private class OrderItem
+    {
+        public string Icon { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+        public decimal Total => Price * Quantity;
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .checkout-container {
+        display: grid;
+        grid-template-columns: 1fr 450px;
+        gap: 2rem;
+    }
+
+    @@media (max-width: 1024px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+        }
+
+        .order-summary {
+            order: -1;
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .payment-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .payment-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .payment-option:hover {
+        border-color: #94a3b8;
+    }
+
+    .payment-option.selected {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+
+    .payment-option span {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #475569;
+    }
+
+    .billing-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 1rem;
+        height: 1rem;
+        cursor: pointer;
+    }
+
+    .checkbox-wrapper label {
+        font-size: 0.875rem;
+        color: #64748b;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .order-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .item-details {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .item-icon {
+        font-size: 2rem;
+    }
+
+    .item-name {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .item-description {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .item-price {
+        text-align: right;
+    }
+
+    .item-quantity {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .item-total {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .order-totals {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: #475569;
+    }
+
+    .total-row.grand-total {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1e293b;
+        padding-top: 0.75rem;
+    }
+
+    .promo-code-input {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .promo-code-input > :first-child {
+        flex: 1;
+    }
+
+    .muted-text {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+</style>
