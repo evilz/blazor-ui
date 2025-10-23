@@ -269,6 +269,339 @@
             </Card>
         </div>
     </div>
+
+    <!-- Status & Indicators Section -->
+    <div class="components-section">
+        <div class="section-header">
+            <h2>Status & Indicators</h2>
+            <p>Badges, progress bars, and status indicators</p>
+        </div>
+        
+        <div class="components-grid">
+            <!-- Badges Card -->
+            <Card>
+                <CardHeader>
+                    <div class="header-with-icon">
+                        <Icon Name="label" />
+                        <h3>Status Badges</h3>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="badges-showcase">
+                        <div class="badge-row">
+                            <span class="label-text">Success:</span>
+                            <span class="status-badge success">Completed</span>
+                            <span class="status-badge success">Active</span>
+                            <span class="status-badge success">Approved</span>
+                        </div>
+                        <Separator />
+                        <div class="badge-row">
+                            <span class="label-text">Warning:</span>
+                            <span class="status-badge warning">Pending</span>
+                            <span class="status-badge warning">Review</span>
+                            <span class="status-badge warning">On Hold</span>
+                        </div>
+                        <Separator />
+                        <div class="badge-row">
+                            <span class="label-text">Info:</span>
+                            <span class="status-badge info">Processing</span>
+                            <span class="status-badge info">In Progress</span>
+                            <span class="status-badge info">Scheduled</span>
+                        </div>
+                        <Separator />
+                        <div class="badge-row">
+                            <span class="label-text">Danger:</span>
+                            <span class="status-badge danger">Cancelled</span>
+                            <span class="status-badge danger">Failed</span>
+                            <span class="status-badge danger">Rejected</span>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Progress Indicators Card -->
+            <Card>
+                <CardHeader>
+                    <div class="header-with-icon">
+                        <Icon Name="trending_up" />
+                        <h3>Progress Indicators</h3>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="progress-showcase">
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Project Completion</span>
+                                <span class="progress-value">75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%; background: #3b82f6;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Storage Used</span>
+                                <span class="progress-value">42%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 42%; background: #10b981;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Memory Usage</span>
+                                <span class="progress-value">88%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 88%; background: #f59e0b;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Bandwidth</span>
+                                <span class="progress-value">95%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 95%; background: #ef4444;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Alert Messages Card -->
+            <Card>
+                <CardHeader>
+                    <div class="header-with-icon">
+                        <Icon Name="info" />
+                        <h3>Alert Messages</h3>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="alerts-showcase">
+                        <div class="alert alert-success">
+                            <Icon Name="check_circle" Style="color: #16a34a;" />
+                            <div>
+                                <div class="alert-title">Success!</div>
+                                <div class="alert-message">Your changes have been saved successfully.</div>
+                            </div>
+                        </div>
+                        <div class="alert alert-warning">
+                            <Icon Name="warning" Style="color: #f59e0b;" />
+                            <div>
+                                <div class="alert-title">Warning</div>
+                                <div class="alert-message">Your session will expire in 5 minutes.</div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <Icon Name="info" Style="color: #3b82f6;" />
+                            <div>
+                                <div class="alert-title">Information</div>
+                                <div class="alert-message">A new version is available for download.</div>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger">
+                            <Icon Name="error" Style="color: #ef4444;" />
+                            <div>
+                                <div class="alert-title">Error</div>
+                                <div class="alert-message">Failed to process your request. Please try again.</div>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
+
+    <!-- Data Display Section -->
+    <div class="components-section">
+        <div class="section-header">
+            <h2>Data Display</h2>
+            <p>Tables and structured data presentation</p>
+        </div>
+        
+        <div class="components-grid full-width">
+            <!-- Data Table Card -->
+            <Card>
+                <CardHeader>
+                    <div class="header-with-icon">
+                        <Icon Name="table_chart" />
+                        <h3>Recent Transactions</h3>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <DataTable Items="transactions" TItem="Transaction">
+                        <DataColumns Context="transaction">
+                            <DataTableColumn TItem="Transaction" Header="ID" Property="x => x.Id" />
+                            <DataTableColumn TItem="Transaction" Header="Date" Property="x => x.Date" />
+                            <DataTableColumn TItem="Transaction" Header="Description" Property="x => x.Description" />
+                            <DataTableColumn TItem="Transaction" Header="Category" Property="x => x.Category" />
+                            <DataTableColumn TItem="Transaction" Header="Amount" Property="x => x.Amount" />
+                            <DataTableColumn TItem="Transaction" Header="Status">
+                                <Template>
+                                    <span class="status-badge @GetTransactionStatusClass(transaction.Status)">@transaction.Status</span>
+                                </Template>
+                            </DataTableColumn>
+                        </DataColumns>
+                    </DataTable>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
+
+    <!-- Advanced Components Section -->
+    <div class="components-section">
+        <div class="section-header">
+            <h2>Advanced Components</h2>
+            <p>Complex interactive elements and layouts</p>
+        </div>
+        
+        <div class="components-grid">
+            <!-- Tabs Card -->
+            <Card>
+                <CardHeader>
+                    <h3>Tab Navigation</h3>
+                </CardHeader>
+                <CardContent>
+                    <div class="tabs-container">
+                        <div class="tabs-header">
+                            <button class="tab-button @(activeTab == "overview" ? "active" : "")" @onclick="@(() => activeTab = "overview")">
+                                <Icon Name="dashboard" />
+                                Overview
+                            </button>
+                            <button class="tab-button @(activeTab == "analytics" ? "active" : "")" @onclick="@(() => activeTab = "analytics")">
+                                <Icon Name="analytics" />
+                                Analytics
+                            </button>
+                            <button class="tab-button @(activeTab == "reports" ? "active" : "")" @onclick="@(() => activeTab = "reports")">
+                                <Icon Name="description" />
+                                Reports
+                            </button>
+                        </div>
+                        <div class="tab-content">
+                            @if (activeTab == "overview")
+                            {
+                                <div class="tab-panel">
+                                    <h4>Overview Panel</h4>
+                                    <p>This is the overview content with general information.</p>
+                                </div>
+                            }
+                            else if (activeTab == "analytics")
+                            {
+                                <div class="tab-panel">
+                                    <h4>Analytics Panel</h4>
+                                    <p>View detailed analytics and metrics here.</p>
+                                </div>
+                            }
+                            else if (activeTab == "reports")
+                            {
+                                <div class="tab-panel">
+                                    <h4>Reports Panel</h4>
+                                    <p>Access and download your reports.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Icon Showcase Card -->
+            <Card>
+                <CardHeader>
+                    <div class="header-with-icon">
+                        <Icon Name="emoji_emotions" />
+                        <h3>Icon Library</h3>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="icons-grid">
+                        <div class="icon-item">
+                            <Icon Name="home" />
+                            <span>home</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="star" />
+                            <span>star</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="favorite" />
+                            <span>favorite</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="search" />
+                            <span>search</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="settings" />
+                            <span>settings</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="account_circle" />
+                            <span>account</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="shopping_cart" />
+                            <span>cart</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="notifications" />
+                            <span>notify</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="mail" />
+                            <span>mail</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="download" />
+                            <span>download</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="upload" />
+                            <span>upload</span>
+                        </div>
+                        <div class="icon-item">
+                            <Icon Name="delete" />
+                            <span>delete</span>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Loading States Card -->
+            <Card>
+                <CardHeader>
+                    <div class="header-with-icon">
+                        <Icon Name="hourglass_empty" />
+                        <h3>Loading States</h3>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="loading-showcase">
+                        <div class="loading-item">
+                            <div class="spinner spinner-border"></div>
+                            <span>Border Spinner</span>
+                        </div>
+                        <div class="loading-item">
+                            <div class="spinner spinner-grow"></div>
+                            <span>Growing Spinner</span>
+                        </div>
+                        <div class="loading-item">
+                            <div class="spinner spinner-pulse"></div>
+                            <span>Pulse Animation</span>
+                        </div>
+                        <div class="loading-item">
+                            <div class="dots-loader">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span>Dots Loader</span>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -277,6 +610,7 @@
     private string selectedDateString = DateTime.Now.ToString("yyyy-MM-dd");
     
     private  DateTime? date, date1 = DateTime.Now;
+    private string activeTab = "overview";
  
     
     private List<TeamMember> teamMembers = new()
@@ -294,6 +628,15 @@
         new Notification { From = "Team", Title = "Meeting reminder", Time = "3 hours ago", IsRead = true }
     };
 
+    private List<Transaction> transactions = new()
+    {
+        new Transaction { Id = "TRX001", Date = "Oct 23, 2025", Description = "Premium Subscription", Category = "Subscription", Amount = "$99.00", Status = "Completed" },
+        new Transaction { Id = "TRX002", Date = "Oct 22, 2025", Description = "Product Purchase", Category = "Sales", Amount = "$249.50", Status = "Completed" },
+        new Transaction { Id = "TRX003", Date = "Oct 22, 2025", Description = "Refund Request", Category = "Refund", Amount = "-$50.00", Status = "Processing" },
+        new Transaction { Id = "TRX004", Date = "Oct 21, 2025", Description = "Service Payment", Category = "Services", Amount = "$175.00", Status = "Pending" },
+        new Transaction { Id = "TRX005", Date = "Oct 20, 2025", Description = "Upgrade Plan", Category = "Subscription", Amount = "$199.00", Status = "Completed" }
+    };
+
     protected override void OnInitialized()
     {
         breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
@@ -306,6 +649,18 @@
     private void HandleSubmit()
     {
         // Handle form submission
+    }
+
+    private string GetTransactionStatusClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "completed" => "success",
+            "pending" => "warning",
+            "processing" => "info",
+            "cancelled" or "failed" => "danger",
+            _ => ""
+        };
     }
 
     public class FormData
@@ -331,6 +686,16 @@
         public string Title { get; set; } = "";
         public string Time { get; set; } = "";
         public bool IsRead { get; set; }
+    }
+
+    public class Transaction
+    {
+        public string Id { get; set; } = "";
+        public string Date { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Category { get; set; } = "";
+        public string Amount { get; set; } = "";
+        public string Status { get; set; } = "";
     }
 }
 
@@ -692,6 +1057,301 @@
 
         .stat-value {
             font-size: 1.5rem;
+        }
+    }
+
+    /* Status Badges */
+    .badges-showcase {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .badge-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .label-text {
+        font-weight: 600;
+        color: #475569;
+        min-width: 80px;
+    }
+
+    /* Progress Indicators */
+    .progress-showcase {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .progress-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.875rem;
+        color: #475569;
+        font-weight: 500;
+    }
+
+    .progress-value {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .progress-bar {
+        height: 10px;
+        background: #e2e8f0;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 0.3s ease;
+    }
+
+    /* Alert Messages */
+    .alerts-showcase {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .alert {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid;
+        align-items: flex-start;
+    }
+
+    .alert-success {
+        background: #f0fdf4;
+        border-color: #86efac;
+    }
+
+    .alert-warning {
+        background: #fffbeb;
+        border-color: #fcd34d;
+    }
+
+    .alert-info {
+        background: #eff6ff;
+        border-color: #93c5fd;
+    }
+
+    .alert-danger {
+        background: #fef2f2;
+        border-color: #fca5a5;
+    }
+
+    .alert-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .alert-message {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    /* Tabs */
+    .tabs-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .tabs-header {
+        display: flex;
+        border-bottom: 2px solid #e2e8f0;
+        gap: 0;
+    }
+
+    .tab-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        color: #64748b;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9375rem;
+    }
+
+    .tab-button:hover {
+        color: #1e293b;
+        background: #f8fafc;
+    }
+
+    .tab-button.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .tab-content {
+        padding: 1.5rem 0;
+    }
+
+    .tab-panel h4 {
+        margin: 0 0 0.75rem 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .tab-panel p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    /* Icons Grid */
+    .icons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .icon-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+    }
+
+    .icon-item:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+
+    .icon-item span {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-align: center;
+    }
+
+    /* Loading States */
+    .loading-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 2rem;
+    }
+
+    .loading-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+
+    .loading-item span {
+        font-size: 0.875rem;
+        color: #64748b;
+        text-align: center;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .spinner-border {
+        border: 4px solid #e2e8f0;
+        border-top-color: #3b82f6;
+        animation: spin 1s linear infinite;
+    }
+
+    .spinner-grow {
+        background: #3b82f6;
+        animation: grow 1s ease-in-out infinite;
+    }
+
+    .spinner-pulse {
+        background: #3b82f6;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .dots-loader {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .dots-loader span {
+        width: 12px;
+        height: 12px;
+        background: #3b82f6;
+        border-radius: 50%;
+        animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    .dots-loader span:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .dots-loader span:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes grow {
+        0%, 100% {
+            transform: scale(0);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.3;
+        }
+    }
+
+    @@keyframes bounce {
+        0%, 80%, 100% {
+            transform: scale(0);
+        }
+        40% {
+            transform: scale(1);
         }
     }
 </style>
