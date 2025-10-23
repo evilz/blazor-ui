@@ -1,0 +1,142 @@
+@page "/comments"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+@using BlazorApp.Services
+@inject IJsonPlaceholderService JsonPlaceholderService
+
+<PageTitle>Comments - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Comments</h1>
+    <p>Browse comments from JSONPlaceholder API</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading">Loading comments...</div>
+}
+else if (comments.Count == 0)
+{
+    <Card>
+        <CardContent>
+            <p>No comments found.</p>
+        </CardContent>
+    </Card>
+}
+else
+{
+    <div class="comments-list">
+        @foreach (var comment in comments.Take(30))
+        {
+            <Card>
+                <CardHeader>
+                    <div class="comment-header">
+                        <div>
+                            <h4>@comment.Name</h4>
+                            <p class="comment-email">@comment.Email</p>
+                        </div>
+                        <Badge Text="@($"Post {comment.PostId}")" Type="BadgeType.Outline" />
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <p class="comment-body">@comment.Body</p>
+                    <small class="comment-id">Comment #@comment.Id</small>
+                </CardContent>
+            </Card>
+        }
+    </div>
+}
+
+@code {
+    private List<Comment> comments = new();
+    private bool isLoading = true;
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Comments") { Url = "/comments" }
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            comments = await JsonPlaceholderService.GetCommentsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading comments: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .comment-header h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        text-transform: capitalize;
+    }
+
+    .comment-email {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #3b82f6;
+    }
+
+    .comment-body {
+        color: #475569;
+        line-height: 1.6;
+        margin: 0 0 1rem 0;
+    }
+
+    .comment-id {
+        color: #94a3b8;
+        font-size: 0.875rem;
+    }
+</style>

@@ -195,6 +195,9 @@
   .min-w-full {
     min-width: 100%;
   }
+  .flex-shrink {
+    flex-shrink: 1;
+  }
   .flex-col {
     flex-direction: column;
   }
