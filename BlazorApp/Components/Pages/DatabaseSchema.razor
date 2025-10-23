@@ -13,17 +13,15 @@
         <Button Text="Add Table" Icon="add_box" OnClick="AddTable" />
         <Button Text="Clear All" Icon="delete_sweep" Type="ButtonType.Destructive" OnClick="ClearSchema" />
         <div class="toolbar-spacer"></div>
-        <Button Text="Export SQL" Icon="code" Type="ButtonType.Secondary" />
-        <Button Text="Save Schema" Icon="save" Type="ButtonType.Primary" />
+        <Button Text="Export SQL" Icon="code" Type="ButtonType.Secondary" OnClick="ExportSQL" />
+        <Button Text="Save Schema" Icon="save" Type="ButtonType.Primary" OnClick="SaveSchema" />
     </div>
 
     <div class="canvas-wrapper">
         <div class="canvas" @ref="canvasElement">
             @foreach (var table in tables)
             {
-                <div class="db-table" style="left: @(table.X)px; top: @(table.Y)px;" 
-                     @onmousedown="@(e => StartDrag(table, e))"
-                     @onmousedown:preventDefault>
+                <div class="db-table" style="left: @(table.X)px; top: @(table.Y)px;">
                     <div class="table-header">
                         <Icon Name="table_chart" Size="18px" />
                         <span class="table-name">@table.Name</span>
@@ -62,11 +60,12 @@
 </div>
 
 @code {
+    private const int InitialTableX = 50;
+    private const int InitialTableY = 50;
+    private const int TableOffsetIncrement = 30;
+    
     private ElementReference canvasElement;
     private List<DatabaseTable> tables = new();
-    private DatabaseTable? draggingTable = null;
-    private double dragStartX = 0;
-    private double dragStartY = 0;
     private int tableCounter = 1;
     private int fieldCounter = 1;
 
@@ -76,8 +75,8 @@
         tables.Add(new DatabaseTable
         {
             Name = "Users",
-            X = 50,
-            Y = 50,
+            X = InitialTableX,
+            Y = InitialTableY,
             Fields = new List<DatabaseField>
             {
                 new DatabaseField { Name = "id", Type = "INT", IsPrimaryKey = true },
@@ -136,8 +135,8 @@
         tables.Add(new DatabaseTable
         {
             Name = $"NewTable{tableCounter++}",
-            X = 50 + (tables.Count * 30),
-            Y = 50 + (tables.Count * 30),
+            X = InitialTableX + (tables.Count * TableOffsetIncrement),
+            Y = InitialTableY + (tables.Count * TableOffsetIncrement),
             Fields = new List<DatabaseField>
             {
                 new DatabaseField { Name = "id", Type = "INT", IsPrimaryKey = true }
@@ -166,22 +165,16 @@
         fieldCounter = 1;
     }
 
-    private void StartDrag(DatabaseTable table, MouseEventArgs e)
+    private void ExportSQL()
     {
-        draggingTable = table;
-        dragStartX = e.ClientX - table.X;
-        dragStartY = e.ClientY - table.Y;
+        // TODO: Implement SQL export functionality
+        // This would generate CREATE TABLE statements from the schema
     }
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    private void SaveSchema()
     {
-        if (firstRender)
-        {
-            // Setup mouse event listeners for drag functionality
-            // Note: Full drag-and-drop would require JavaScript interop
-            // This is a simplified version for demonstration
-        }
-        return Task.CompletedTask;
+        // TODO: Implement schema save functionality
+        // This would save the schema to local storage or database
     }
 
     private class DatabaseTable
