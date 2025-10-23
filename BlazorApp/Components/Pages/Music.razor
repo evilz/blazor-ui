@@ -1,0 +1,603 @@
+@page "/music"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+
+<PageTitle>Music - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Music</h1>
+    <p>Your personal music player</p>
+</div>
+
+<div class="music-container">
+    <!-- Now Playing Section -->
+    <Card Style="margin-bottom: 2rem;">
+        <CardContent>
+            <div class="now-playing">
+                <div class="album-art-container">
+                    <div class="album-art">
+                        <div class="album-art-gradient"></div>
+                        <div class="album-art-icon">
+                            <Icon Name="library_music" Size="120px" />
+                        </div>
+                    </div>
+                </div>
+                <div class="track-info">
+                    <h2 class="track-title">@currentTrack.Title</h2>
+                    <p class="track-artist">@currentTrack.Artist</p>
+                    <p class="track-album">@currentTrack.Album • @currentTrack.Year</p>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-section">
+                <span class="time-label">@currentTime</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: @progressPercentage%"></div>
+                        <div class="progress-thumb" style="left: @progressPercentage%"></div>
+                    </div>
+                </div>
+                <span class="time-label">@currentTrack.Duration</span>
+            </div>
+
+            <!-- Player Controls -->
+            <div class="player-controls">
+                <Button Icon="shuffle" Type="ButtonType.Ghost" Size="ButtonSize.Small" OnClick="() => ToggleShuffle()" 
+                        Style="@(isShuffleOn ? "color: #8b5cf6;" : "")" Tooltip="Shuffle" />
+                <Button Icon="skip_previous" Type="ButtonType.Ghost" OnClick="() => PlayPrevious()" Tooltip="Previous" />
+                <Button Icon="@(isPlaying ? "pause_circle" : "play_circle")" 
+                        Type="ButtonType.Primary" 
+                        Size="ButtonSize.Large" 
+                        OnClick="() => TogglePlay()"
+                        Style="font-size: 3rem;"
+                        Tooltip="@(isPlaying ? "Pause" : "Play")" />
+                <Button Icon="skip_next" Type="ButtonType.Ghost" OnClick="() => PlayNext()" Tooltip="Next" />
+                <Button Icon="repeat" Type="ButtonType.Ghost" Size="ButtonSize.Small" OnClick="() => ToggleRepeat()" 
+                        Style="@(isRepeatOn ? "color: #8b5cf6;" : "")" Tooltip="Repeat" />
+            </div>
+
+            <!-- Volume Control -->
+            <div class="volume-control">
+                <Icon Name="volume_up" Size="20px" />
+                <div class="volume-bar-container">
+                    <div class="volume-bar">
+                        <div class="volume-bar-fill" style="width: @volumePercentage%"></div>
+                    </div>
+                </div>
+                <span class="volume-label">@volumePercentage%</span>
+            </div>
+        </CardContent>
+    </Card>
+
+    <!-- Playlist Section -->
+    <Card>
+        <CardHeader>
+            <div class="playlist-header">
+                <h3>Playlist</h3>
+                <Badge Text="@($"{playlist.Count} tracks")" Type="BadgeType.Secondary" />
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div class="playlist">
+                @foreach (var track in playlist)
+                {
+                    <div class="playlist-item @(track.Id == currentTrack.Id ? "active" : "")" 
+                         @onclick="() => SelectTrack(track)">
+                        <div class="playlist-item-left">
+                            <div class="playlist-number">
+                                @if (track.Id == currentTrack.Id && isPlaying)
+                                {
+                                    <Icon Name="equalizer" Size="20px" Style="color: #8b5cf6;" />
+                                }
+                                else
+                                {
+                                    <span>@track.Id</span>
+                                }
+                            </div>
+                            <div class="playlist-item-info">
+                                <p class="playlist-item-title">@track.Title</p>
+                                <p class="playlist-item-artist">@track.Artist</p>
+                            </div>
+                        </div>
+                        <div class="playlist-item-right">
+                            <span class="playlist-item-album">@track.Album</span>
+                            <span class="playlist-item-duration">@track.Duration</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </CardContent>
+    </Card>
+</div>
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+    private List<Track> playlist = new();
+    private Track currentTrack = new();
+    private int currentTrackIndex = 0;
+    private bool isPlaying = false;
+    private bool isShuffleOn = false;
+    private bool isRepeatOn = false;
+    private string currentTime = "0:00";
+    private int progressPercentage = 35;
+    private int volumePercentage = 75;
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Music") { Url = "/music" }
+        };
+
+        // Initialize playlist with sample tracks
+        playlist = new List<Track>
+        {
+            new Track 
+            { 
+                Id = 1, 
+                Title = "Midnight Dreams", 
+                Artist = "Luna Echo", 
+                Album = "Nocturnal", 
+                Duration = "3:45", 
+                Genre = "Electronic",
+                Year = 2024
+            },
+            new Track 
+            { 
+                Id = 2, 
+                Title = "Summer Breeze", 
+                Artist = "The Wanderers", 
+                Album = "Seasons", 
+                Duration = "4:12", 
+                Genre = "Indie Pop",
+                Year = 2023
+            },
+            new Track 
+            { 
+                Id = 3, 
+                Title = "Electric Soul", 
+                Artist = "Neon Lights", 
+                Album = "Voltage", 
+                Duration = "3:58", 
+                Genre = "Synthwave",
+                Year = 2024
+            },
+            new Track 
+            { 
+                Id = 4, 
+                Title = "Starlight", 
+                Artist = "Aurora Ray", 
+                Album = "Celestial", 
+                Duration = "4:33", 
+                Genre = "Dream Pop",
+                Year = 2023
+            },
+            new Track 
+            { 
+                Id = 5, 
+                Title = "Ocean Waves", 
+                Artist = "Coastal Drift", 
+                Album = "Horizons", 
+                Duration = "5:21", 
+                Genre = "Ambient",
+                Year = 2024
+            },
+            new Track 
+            { 
+                Id = 6, 
+                Title = "City Lights", 
+                Artist = "Metro Pulse", 
+                Album = "Urban Stories", 
+                Duration = "3:29", 
+                Genre = "Electronic",
+                Year = 2023
+            },
+            new Track 
+            { 
+                Id = 7, 
+                Title = "Moonlit Path", 
+                Artist = "Silver Creek", 
+                Album = "Wanderlust", 
+                Duration = "4:47", 
+                Genre = "Folk Rock",
+                Year = 2024
+            },
+            new Track 
+            { 
+                Id = 8, 
+                Title = "Neon Nights", 
+                Artist = "Retro Wave", 
+                Album = "1984", 
+                Duration = "3:55", 
+                Genre = "Synthwave",
+                Year = 2023
+            }
+        };
+
+        currentTrack = playlist.FirstOrDefault() ?? new Track();
+        currentTrackIndex = 0;
+    }
+
+    private void TogglePlay()
+    {
+        isPlaying = !isPlaying;
+    }
+
+    private void PlayNext()
+    {
+        if (playlist.Count == 0) return;
+
+        if (currentTrackIndex < playlist.Count - 1)
+        {
+            currentTrackIndex++;
+            currentTrack = playlist[currentTrackIndex];
+            progressPercentage = 0;
+            currentTime = "0:00";
+        }
+        else if (isRepeatOn)
+        {
+            currentTrackIndex = 0;
+            currentTrack = playlist[currentTrackIndex];
+            progressPercentage = 0;
+            currentTime = "0:00";
+        }
+    }
+
+    private void PlayPrevious()
+    {
+        if (playlist.Count == 0) return;
+
+        if (currentTrackIndex > 0)
+        {
+            currentTrackIndex--;
+            currentTrack = playlist[currentTrackIndex];
+            progressPercentage = 0;
+            currentTime = "0:00";
+        }
+        else if (isRepeatOn)
+        {
+            currentTrackIndex = playlist.Count - 1;
+            currentTrack = playlist[currentTrackIndex];
+            progressPercentage = 0;
+            currentTime = "0:00";
+        }
+    }
+
+    private void SelectTrack(Track track)
+    {
+        if (playlist.Count == 0) return;
+
+        currentTrackIndex = playlist.FindIndex(t => t.Id == track.Id);
+        if (currentTrackIndex >= 0)
+        {
+            currentTrack = track;
+            isPlaying = true;
+            progressPercentage = 0;
+            currentTime = "0:00";
+        }
+    }
+
+    private void ToggleShuffle()
+    {
+        isShuffleOn = !isShuffleOn;
+    }
+
+    private void ToggleRepeat()
+    {
+        isRepeatOn = !isRepeatOn;
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .music-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Now Playing Section */
+    .now-playing {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem;
+        gap: 2rem;
+    }
+
+    .album-art-container {
+        width: 100%;
+        max-width: 320px;
+        aspect-ratio: 1;
+    }
+
+    .album-art {
+        width: 100%;
+        height: 100%;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .album-art-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.2) 100%);
+    }
+
+    .album-art-icon {
+        position: relative;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .track-info {
+        text-align: center;
+        width: 100%;
+    }
+
+    .track-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        color: #1e293b;
+    }
+
+    .track-artist {
+        font-size: 1.25rem;
+        color: #64748b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .track-album {
+        font-size: 1rem;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* Progress Bar */
+    .progress-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        margin: 1.5rem 0;
+    }
+
+    .time-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        min-width: 3rem;
+        text-align: center;
+    }
+
+    .progress-bar-container {
+        flex: 1;
+        height: 6px;
+        position: relative;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 100%;
+        background: #e2e8f0;
+        border-radius: 3px;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .progress-thumb {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 16px;
+        height: 16px;
+        background: white;
+        border: 3px solid #8b5cf6;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: left 0.3s ease;
+    }
+
+    /* Player Controls */
+    .player-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    /* Volume Control */
+    .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        max-width: 300px;
+        margin: 1rem auto 0;
+    }
+
+    .volume-bar-container {
+        flex: 1;
+        height: 6px;
+    }
+
+    .volume-bar {
+        width: 100%;
+        height: 100%;
+        background: #e2e8f0;
+        border-radius: 3px;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .volume-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .volume-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        min-width: 3rem;
+        text-align: right;
+    }
+
+    /* Playlist */
+    .playlist-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .playlist-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .playlist {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .playlist-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .playlist-item:hover {
+        background-color: #f8fafc;
+    }
+
+    .playlist-item.active {
+        background-color: #f1f5f9;
+    }
+
+    .playlist-item-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .playlist-number {
+        width: 2rem;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .playlist-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .playlist-item-title {
+        margin: 0 0 0.25rem 0;
+        font-weight: 500;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .playlist-item.active .playlist-item-title {
+        color: #8b5cf6;
+    }
+
+    .playlist-item-artist {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .playlist-item-right {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-left: 1rem;
+    }
+
+    .playlist-item-album {
+        font-size: 0.875rem;
+        color: #64748b;
+        display: none;
+    }
+
+    .playlist-item-duration {
+        font-size: 0.875rem;
+        color: #94a3b8;
+        min-width: 3rem;
+        text-align: right;
+    }
+
+    /* Responsive Design */
+    @@media (min-width: 768px) {
+        .now-playing {
+            flex-direction: row;
+            align-items: flex-start;
+            padding: 3rem 2rem;
+        }
+
+        .album-art-container {
+            max-width: 280px;
+        }
+
+        .track-info {
+            text-align: left;
+            flex: 1;
+        }
+
+        .playlist-item-album {
+            display: block;
+        }
+    }
+
+    @@media (min-width: 1024px) {
+        .album-art-container {
+            max-width: 320px;
+        }
+    }
+</style>
