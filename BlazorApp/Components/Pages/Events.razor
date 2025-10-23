@@ -1,0 +1,520 @@
+@page "/events"
+@rendermode InteractiveServer
+@inject ICalendarService CalendarService
+@using BlazorApp.Models
+@using BlazorApp.Services
+
+<PageTitle>Events - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <div class="page-header-content">
+        <div>
+            <h1>Events</h1>
+            <p>Browse upcoming events and meetings</p>
+        </div>
+        <div class="header-actions">
+            <Button Text="New Event" Icon="add" OnClick="NavigateToCalendar" />
+        </div>
+    </div>
+</div>
+
+<div class="events-filters">
+    <div class="filter-buttons">
+        <Button Text="All Events" 
+                Type="@(selectedFilter == "all" ? ButtonType.Primary : ButtonType.Secondary)" 
+                Size="ButtonSize.Small" 
+                OnClick="@(() => FilterEvents("all"))" />
+        <Button Text="Upcoming" 
+                Type="@(selectedFilter == "upcoming" ? ButtonType.Primary : ButtonType.Secondary)" 
+                Size="ButtonSize.Small" 
+                OnClick="@(() => FilterEvents("upcoming"))" />
+        <Button Text="This Week" 
+                Type="@(selectedFilter == "week" ? ButtonType.Primary : ButtonType.Secondary)" 
+                Size="ButtonSize.Small" 
+                OnClick="@(() => FilterEvents("week"))" />
+        <Button Text="This Month" 
+                Type="@(selectedFilter == "month" ? ButtonType.Primary : ButtonType.Secondary)" 
+                Size="ButtonSize.Small" 
+                OnClick="@(() => FilterEvents("month"))" />
+    </div>
+    <div class="filter-category">
+        <select @bind="selectedCategory" @bind:after="ApplyFilters">
+            <option value="all">All Categories</option>
+            <option value="Meeting">Meetings</option>
+            <option value="Event">Events</option>
+            <option value="Appointment">Appointments</option>
+            <option value="Reminder">Reminders</option>
+        </select>
+    </div>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading-state">
+        <Icon Name="progress_activity" Size="48px" />
+        <p>Loading events...</p>
+    </div>
+}
+else if (!filteredEvents.Any())
+{
+    <div class="empty-state">
+        <Icon Name="event_busy" Size="64px" />
+        <h3>No events found</h3>
+        <p>There are no events matching your criteria.</p>
+    </div>
+}
+else
+{
+    <div class="events-grid">
+        @foreach (var evt in filteredEvents)
+        {
+            <Card Style="transition: transform 0.2s, box-shadow 0.2s;">
+                <CardContent>
+                    <div class="event-card-content">
+                        <div class="event-date-badge" style="background: @evt.Color">
+                            <div class="event-month">@evt.StartTime.ToString("MMM")</div>
+                            <div class="event-day">@evt.StartTime.Day</div>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-header">
+                                <h3 class="event-title">@evt.Title</h3>
+                                <Badge Text="@evt.Category" Type="BadgeType.Outline" />
+                            </div>
+                            <div class="event-meta">
+                                <div class="event-meta-item">
+                                    <Icon Name="schedule" Size="16px" />
+                                    <span>@FormatEventTime(evt)</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(evt.Location))
+                                {
+                                    <div class="event-meta-item">
+                                        <Icon Name="@(evt.IsOnline ? "videocam" : "location_on")" Size="16px" />
+                                        <span>@evt.Location</span>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(evt.Organizer))
+                                {
+                                    <div class="event-meta-item">
+                                        <Icon Name="person" Size="16px" />
+                                        <span>Organized by @evt.Organizer</span>
+                                    </div>
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(evt.Description))
+                            {
+                                <p class="event-description">@evt.Description</p>
+                            }
+                            @if (evt.Attendees.Count > 0)
+                            {
+                                <div class="event-attendees">
+                                    <div class="attendees-avatars">
+                                        @foreach (var attendee in evt.Attendees.Take(3))
+                                        {
+                                            <div class="attendee-avatar" title="@attendee">
+                                                @GetInitials(attendee)
+                                            </div>
+                                        }
+                                        @if (evt.Attendees.Count > 3)
+                                        {
+                                            <div class="attendee-avatar more-attendees" title="@string.Join(", ", evt.Attendees.Skip(3))">
+                                                +@(evt.Attendees.Count - 3)
+                                            </div>
+                                        }
+                                    </div>
+                                    <span class="attendees-count">@evt.Attendees.Count attendee@(evt.Attendees.Count != 1 ? "s" : "")</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="event-actions">
+                        @if (evt.IsOnline && !string.IsNullOrEmpty(evt.MeetingLink))
+                        {
+                            <Button Text="Join Meeting" 
+                                    Icon="videocam" 
+                                    Type="ButtonType.Primary" 
+                                    Size="ButtonSize.Small" 
+                                    OnClick="@(() => OpenMeetingLink(evt.MeetingLink))" />
+                        }
+                        <Button Text="View Details" 
+                                Type="ButtonType.Secondary" 
+                                Size="ButtonSize.Small" 
+                                OnClick="@(() => ViewEventDetails(evt))" />
+                    </div>
+                </CardContent>
+            </Card>
+        }
+    </div>
+}
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    
+    private List<CalendarEvent> events = new();
+    private List<CalendarEvent> filteredEvents = new();
+    private bool isLoading = true;
+    private string selectedFilter = "upcoming";
+    private string selectedCategory = "all";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+    }
+
+    private async Task LoadEvents()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        var startDate = DateTime.Today.AddMonths(-1);
+        var endDate = DateTime.Today.AddMonths(3);
+        events = await CalendarService.GetEventsAsync(startDate, endDate);
+        
+        ApplyFilters();
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void FilterEvents(string filter)
+    {
+        selectedFilter = filter;
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        var filtered = events.AsEnumerable();
+
+        // Apply time filter
+        switch (selectedFilter)
+        {
+            case "upcoming":
+                filtered = filtered.Where(e => e.StartTime >= DateTime.Now);
+                break;
+            case "week":
+                var weekEnd = DateTime.Today.AddDays(7);
+                filtered = filtered.Where(e => e.StartTime >= DateTime.Today && e.StartTime <= weekEnd);
+                break;
+            case "month":
+                var monthEnd = DateTime.Today.AddMonths(1);
+                filtered = filtered.Where(e => e.StartTime >= DateTime.Today && e.StartTime <= monthEnd);
+                break;
+            // "all" shows all events
+        }
+
+        // Apply category filter
+        if (selectedCategory != "all")
+        {
+            filtered = filtered.Where(e => e.Category == selectedCategory);
+        }
+
+        filteredEvents = filtered.OrderBy(e => e.StartTime).ToList();
+    }
+
+    private string FormatEventTime(CalendarEvent evt)
+    {
+        if (evt.IsAllDay)
+            return "All day";
+        
+        var date = evt.StartTime.Date == DateTime.Today 
+            ? "Today" 
+            : evt.StartTime.Date == DateTime.Today.AddDays(1) 
+                ? "Tomorrow" 
+                : evt.StartTime.ToString("ddd, MMM d");
+        
+        return $"{date} · {evt.StartTime:h:mm tt} - {evt.EndTime:h:mm tt}";
+    }
+
+    private string GetInitials(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        if (parts.Length == 1 && parts[0].Length >= 2)
+            return parts[0].Substring(0, 2).ToUpper();
+        return parts.Length > 0 ? parts[0][0].ToString().ToUpper() : "?";
+    }
+
+    private void ViewEventDetails(CalendarEvent evt)
+    {
+        NavigationManager.NavigateTo("/calendar");
+    }
+
+    private void NavigateToCalendar()
+    {
+        NavigationManager.NavigateTo("/calendar");
+    }
+
+    private void OpenMeetingLink(string link)
+    {
+        // In a real app, this would open the link in a new window
+        NavigationManager.NavigateTo(link, true);
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .events-filters {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-category select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.875rem;
+        color: #1e293b;
+        cursor: pointer;
+        min-width: 180px;
+    }
+
+    .filter-category select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .loading-state,
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+        text-align: center;
+    }
+
+    .empty-state h3 {
+        margin: 1rem 0 0.5rem;
+        color: #1e293b;
+    }
+
+    .empty-state p {
+        margin: 0;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .event-card-content {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .event-date-badge {
+        flex-shrink: 0;
+        width: 70px;
+        height: 80px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+
+    .event-month {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+    }
+
+    .event-day {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-top: 0.25rem;
+    }
+
+    .event-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .event-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .event-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .event-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .event-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .event-meta-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .event-description {
+        font-size: 0.875rem;
+        color: #64748b;
+        line-height: 1.5;
+        margin: 0 0 0.75rem 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .event-attendees {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .attendees-avatars {
+        display: flex;
+        margin-left: -0.25rem;
+    }
+
+    .attendee-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 2px solid white;
+        margin-left: -0.5rem;
+        position: relative;
+    }
+
+    .attendee-avatar:first-child {
+        margin-left: 0;
+    }
+
+    .attendee-avatar.more-attendees {
+        background: #94a3b8;
+        font-size: 0.7rem;
+    }
+
+    .attendees-count {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .event-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    @@media (max-width: 768px) {
+        .events-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .events-filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-buttons {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .filter-category select {
+            width: 100%;
+        }
+
+        .page-header-content {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .event-card-content {
+            flex-direction: column;
+        }
+
+        .event-date-badge {
+            width: 100%;
+            height: 60px;
+            flex-direction: row;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .event-day {
+            font-size: 1.5rem;
+        }
+    }
+</style>
