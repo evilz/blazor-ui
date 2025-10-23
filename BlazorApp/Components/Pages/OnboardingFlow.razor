@@ -1,0 +1,588 @@
+@page "/onboarding"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<PageTitle>Onboarding - Blazor UI</PageTitle>
+
+<div class="onboarding-container">
+    <Card Width="600px">
+        <CardHeader>
+            <div class="onboarding-header">
+                <h3>@GetStepTitle()</h3>
+                <p class="step-subtitle">@GetStepSubtitle()</p>
+            </div>
+            
+            <!-- Progress indicator -->
+            <div class="progress-steps">
+                @for (int i = 1; i <= totalSteps; i++)
+                {
+                    <div class="step-indicator @(i == currentStep ? "active" : "") @(i < currentStep ? "completed" : "")">
+                        @if (i < currentStep)
+                        {
+                            <Icon Name="check" Size="16px" />
+                        }
+                        else
+                        {
+                            <span>@i</span>
+                        }
+                    </div>
+                    @if (i < totalSteps)
+                    {
+                        <div class="step-line @(i < currentStep ? "completed" : "")"></div>
+                    }
+                }
+            </div>
+        </CardHeader>
+        
+        <CardContent>
+            <div class="step-content">
+                @if (currentStep == 1)
+                {
+                    <!-- Step 1: Welcome -->
+                    <div class="welcome-step">
+                        <div class="welcome-icon">
+                            <Icon Name="waving_hand" Size="64px" />
+                        </div>
+                        <h2>Welcome to Blazor UI!</h2>
+                        <p>Let's get you set up in just a few steps. We'll guide you through the process of creating your account and personalizing your experience.</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <Icon Name="check_circle" />
+                                <span>Quick and easy setup</span>
+                            </div>
+                            <div class="feature-item">
+                                <Icon Name="check_circle" />
+                                <span>Personalized dashboard</span>
+                            </div>
+                            <div class="feature-item">
+                                <Icon Name="check_circle" />
+                                <span>Powerful features</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (currentStep == 2)
+                {
+                    <!-- Step 2: Personal Information -->
+                    <div class="form-step">
+                        <Input TItem="string" Label="Full Name" Placeholder="Enter your full name" @bind-Value="fullName" />
+                        <Input TItem="string" Label="Email Address" Type="email" Placeholder="you@example.com" @bind-Value="email" />
+                        <Input TItem="string" Label="Phone Number" Type="tel" Placeholder="+1 (555) 000-0000" @bind-Value="phone" />
+                        
+                        <div class="form-group">
+                            <label>Role</label>
+                            <div class="role-options">
+                                <div class="role-option @(role == "developer" ? "selected" : "")" @onclick='() => SelectRole("developer")'>
+                                    <Icon Name="code" Size="24px" />
+                                    <span>Developer</span>
+                                </div>
+                                <div class="role-option @(role == "designer" ? "selected" : "")" @onclick='() => SelectRole("designer")'>
+                                    <Icon Name="palette" Size="24px" />
+                                    <span>Designer</span>
+                                </div>
+                                <div class="role-option @(role == "manager" ? "selected" : "")" @onclick='() => SelectRole("manager")'>
+                                    <Icon Name="business_center" Size="24px" />
+                                    <span>Manager</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (currentStep == 3)
+                {
+                    <!-- Step 3: Preferences -->
+                    <div class="form-step">
+                        <div class="form-group">
+                            <label>Notification Preferences</label>
+                            <div class="preference-item">
+                                <div class="preference-info">
+                                    <div class="preference-title">Email Notifications</div>
+                                    <div class="preference-description">Receive updates and alerts via email</div>
+                                </div>
+                                <input type="checkbox" @bind="emailNotifications" class="checkbox" />
+                            </div>
+                            <div class="preference-item">
+                                <div class="preference-info">
+                                    <div class="preference-title">Push Notifications</div>
+                                    <div class="preference-description">Get real-time notifications in your browser</div>
+                                </div>
+                                <input type="checkbox" @bind="pushNotifications" class="checkbox" />
+                            </div>
+                            <div class="preference-item">
+                                <div class="preference-info">
+                                    <div class="preference-title">Weekly Newsletter</div>
+                                    <div class="preference-description">Subscribe to our weekly product updates</div>
+                                </div>
+                                <input type="checkbox" @bind="newsletter" class="checkbox" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Theme Preference</label>
+                            <div class="theme-options">
+                                <div class="theme-option @(theme == "light" ? "selected" : "")" @onclick='() => theme = "light"'>
+                                    <Icon Name="light_mode" Size="24px" />
+                                    <span>Light</span>
+                                </div>
+                                <div class="theme-option @(theme == "dark" ? "selected" : "")" @onclick='() => theme = "dark"'>
+                                    <Icon Name="dark_mode" Size="24px" />
+                                    <span>Dark</span>
+                                </div>
+                                <div class="theme-option @(theme == "auto" ? "selected" : "")" @onclick='() => theme = "auto"'>
+                                    <Icon Name="contrast" Size="24px" />
+                                    <span>Auto</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (currentStep == 4)
+                {
+                    <!-- Step 4: Complete -->
+                    <div class="completion-step">
+                        <div class="success-icon">
+                            <Icon Name="check_circle" Size="64px" />
+                        </div>
+                        <h2>You're all set!</h2>
+                        <p>Your account has been successfully configured. Here's a summary of your setup:</p>
+                        
+                        <div class="summary-section">
+                            <div class="summary-item">
+                                <Icon Name="person" />
+                                <div>
+                                    <div class="summary-label">Name</div>
+                                    <div class="summary-value">@fullName</div>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <Icon Name="mail" />
+                                <div>
+                                    <div class="summary-label">Email</div>
+                                    <div class="summary-value">@email</div>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <Icon Name="work" />
+                                <div>
+                                    <div class="summary-label">Role</div>
+                                    <div class="summary-value">@(role ?? "Not specified")</div>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <Icon Name="@(theme == "light" ? "light_mode" : theme == "dark" ? "dark_mode" : "contrast")" />
+                                <div>
+                                    <div class="summary-label">Theme</div>
+                                    <div class="summary-value">@theme</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </CardContent>
+        
+        <CardFooter>
+            <div class="navigation-buttons">
+                @if (currentStep > 1)
+                {
+                    <Button Text="Previous" Type="ButtonType.Outline" OnClick="PreviousStep" />
+                }
+                
+                <div class="spacer"></div>
+                
+                @if (currentStep < totalSteps)
+                {
+                    <Button Text="@(currentStep == 1 ? "Get Started" : "Next")" OnClick="NextStep" />
+                }
+                else
+                {
+                    <Button Text="Go to Dashboard" OnClick="GoToDashboard" />
+                }
+            </div>
+        </CardFooter>
+    </Card>
+</div>
+
+@code {
+    private int currentStep = 1;
+    private int totalSteps = 4;
+    
+    // Step 2: Personal Information
+    private string fullName = "";
+    private string email = "";
+    private string phone = "";
+    private string? role = null;
+    
+    // Step 3: Preferences
+    private bool emailNotifications = true;
+    private bool pushNotifications = true;
+    private bool newsletter = false;
+    private string theme = "light";
+    
+    private string GetStepTitle()
+    {
+        return currentStep switch
+        {
+            1 => "Welcome",
+            2 => "Personal Information",
+            3 => "Preferences",
+            4 => "Complete",
+            _ => ""
+        };
+    }
+    
+    private string GetStepSubtitle()
+    {
+        return currentStep switch
+        {
+            1 => "Let's begin your journey",
+            2 => "Tell us about yourself",
+            3 => "Customize your experience",
+            4 => "Your setup is complete",
+            _ => ""
+        };
+    }
+    
+    private void NextStep()
+    {
+        if (currentStep < totalSteps)
+        {
+            currentStep++;
+        }
+    }
+    
+    private void PreviousStep()
+    {
+        if (currentStep > 1)
+        {
+            currentStep--;
+        }
+    }
+    
+    private void SelectRole(string selectedRole)
+    {
+        role = selectedRole;
+    }
+    
+    private void GoToDashboard()
+    {
+        // Navigate to dashboard
+        Navigation.NavigateTo("/");
+    }
+}
+
+<style>
+    .onboarding-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem;
+    }
+    
+    .onboarding-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .onboarding-header h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        color: #1e293b;
+    }
+    
+    .step-subtitle {
+        color: #64748b;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    
+    /* Progress Steps */
+    .progress-steps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1.5rem 0;
+    }
+    
+    .step-indicator {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        border: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .step-indicator.active {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: white;
+    }
+    
+    .step-indicator.completed {
+        background: #10b981;
+        border-color: #10b981;
+        color: white;
+    }
+    
+    .step-line {
+        width: 60px;
+        height: 2px;
+        background: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .step-line.completed {
+        background: #10b981;
+    }
+    
+    /* Step Content */
+    .step-content {
+        min-height: 350px;
+        padding: 1rem 0;
+    }
+    
+    /* Welcome Step */
+    .welcome-step {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .welcome-icon {
+        margin-bottom: 1.5rem;
+        color: #f59e0b;
+    }
+    
+    .welcome-step h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1e293b;
+    }
+    
+    .welcome-step > p {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: left;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #10b981;
+    }
+    
+    .feature-item span {
+        color: #1e293b;
+        font-weight: 500;
+    }
+    
+    /* Form Step */
+    .form-step {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .form-group > label {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.95rem;
+    }
+    
+    /* Role Options */
+    .role-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .role-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.25rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+    }
+    
+    .role-option:hover {
+        border-color: #6366f1;
+        background: #f8f9ff;
+    }
+    
+    .role-option.selected {
+        border-color: #6366f1;
+        background: #f8f9ff;
+        color: #6366f1;
+    }
+    
+    .role-option span {
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+    
+    /* Preference Item */
+    .preference-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+    }
+    
+    .preference-info {
+        flex: 1;
+    }
+    
+    .preference-title {
+        font-weight: 500;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .preference-description {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+    
+    .checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    
+    /* Theme Options */
+    .theme-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .theme-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.25rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+    }
+    
+    .theme-option:hover {
+        border-color: #6366f1;
+        background: #f8f9ff;
+    }
+    
+    .theme-option.selected {
+        border-color: #6366f1;
+        background: #f8f9ff;
+        color: #6366f1;
+    }
+    
+    .theme-option span {
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+    
+    /* Completion Step */
+    .completion-step {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .success-icon {
+        margin-bottom: 1.5rem;
+        color: #10b981;
+    }
+    
+    .completion-step h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1e293b;
+    }
+    
+    .completion-step > p {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .summary-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: left;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .summary-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 0.5rem;
+    }
+    
+    .summary-item > div {
+        flex: 1;
+    }
+    
+    .summary-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .summary-value {
+        font-weight: 600;
+        color: #1e293b;
+        text-transform: capitalize;
+    }
+    
+    /* Navigation Buttons */
+    .navigation-buttons {
+        display: flex;
+        width: 100%;
+        gap: 1rem;
+    }
+    
+    .spacer {
+        flex: 1;
+    }
+</style>
