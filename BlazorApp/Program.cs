@@ -23,6 +23,9 @@ builder.Services.AddScoped<IJsonPlaceholderService, MockJsonPlaceholderService>(
 // Add Mail service
 builder.Services.AddScoped<IMailService, MockMailService>();
 
+// Add Calendar service
+builder.Services.AddScoped<ICalendarService, MockCalendarService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
