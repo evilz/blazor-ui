@@ -1,0 +1,637 @@
+@page "/kanban"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+
+<PageTitle>Kanban Board - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <div class="header-content">
+        <div>
+            <h1>Kanban Board</h1>
+            <p>Manage tasks with drag-and-drop columns</p>
+        </div>
+        <Button Icon="settings" Type="ButtonType.Secondary" OnClick="ToggleSettings">
+            Display Settings
+        </Button>
+    </div>
+</div>
+
+@if (showSettings)
+{
+    <Card Style="margin-bottom: 1.5rem;">
+        <CardHeader>
+            <div class="settings-header">
+                <h3>Display Configuration</h3>
+                <Button Icon="close" Type="ButtonType.Ghost" Size="ButtonSize.Small" OnClick="ToggleSettings" />
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div class="settings-grid">
+                <div class="setting-group">
+                    <label class="setting-label">Column Visibility</label>
+                    <div class="checkbox-group">
+                        @foreach (var status in statuses)
+                        {
+                            <label class="checkbox-label">
+                                <input type="checkbox" 
+                                       checked="@visibleColumns.Contains(status)" 
+                                       @onchange="@((e) => ToggleColumn(status, e))" />
+                                <span>@status</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Color Theme</label>
+                    <div class="radio-group">
+                        @foreach (var theme in themes)
+                        {
+                            <label class="radio-label">
+                                <input type="radio" 
+                                       name="theme" 
+                                       value="@theme" 
+                                       checked="@(selectedTheme == theme)"
+                                       @onchange="@(() => ChangeTheme(theme))" />
+                                <span>@theme</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Card Density</label>
+                    <div class="radio-group">
+                        @foreach (var density in densities)
+                        {
+                            <label class="radio-label">
+                                <input type="radio" 
+                                       name="density" 
+                                       value="@density" 
+                                       checked="@(selectedDensity == density)"
+                                       @onchange="@(() => ChangeDensity(density))" />
+                                <span>@density</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Sort By</label>
+                    <div class="radio-group">
+                        @foreach (var sort in sortOptions)
+                        {
+                            <label class="radio-label">
+                                <input type="radio" 
+                                       name="sort" 
+                                       value="@sort" 
+                                       checked="@(selectedSort == sort)"
+                                       @onchange="@(() => ChangeSort(sort))" />
+                                <span>@sort</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Show Card Details</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked="@showAssignee" @onchange="@((e) => showAssignee = (bool)e.Value!)" />
+                            <span>Assignee</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked="@showDueDate" @onchange="@((e) => showDueDate = (bool)e.Value!)" />
+                            <span>Due Date</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked="@showTags" @onchange="@((e) => showTags = (bool)e.Value!)" />
+                            <span>Tags</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked="@showPriority" @onchange="@((e) => showPriority = (bool)e.Value!)" />
+                            <span>Priority</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+}
+
+<div class="kanban-board theme-@selectedTheme density-@selectedDensity">
+    @foreach (var status in visibleColumns)
+    {
+        <div class="kanban-column">
+            <div class="column-header">
+                <div class="column-title">
+                    <Icon Name="@GetStatusIcon(status)" Size="20px" />
+                    <h3>@status</h3>
+                    <span class="card-count">@GetFilteredCards(status).Count()</span>
+                </div>
+                <Button Icon="add" Type="ButtonType.Ghost" Size="ButtonSize.Small" />
+            </div>
+            <div class="column-content">
+                @foreach (var card in GetFilteredCards(status))
+                {
+                    <div class="kanban-card priority-@card.Priority">
+                        @if (showPriority)
+                        {
+                            <div class="card-priority">
+                                <span class="priority-indicator priority-@card.Priority"></span>
+                            </div>
+                        }
+                        <div class="card-header-content">
+                            <h4 class="card-title">@card.Title</h4>
+                            <Icon Name="more_vert" Size="18px" Class="card-menu" />
+                        </div>
+                        @if (!string.IsNullOrEmpty(card.Description))
+                        {
+                            <p class="card-description">@card.Description</p>
+                        }
+                        <div class="card-footer">
+                            @if (showTags && card.Tags.Any())
+                            {
+                                <div class="card-tags">
+                                    @foreach (var tag in card.Tags.Take(2))
+                                    {
+                                        <span class="tag">@tag</span>
+                                    }
+                                    @if (card.Tags.Count > 2)
+                                    {
+                                        <span class="tag">+@(card.Tags.Count - 2)</span>
+                                    }
+                                </div>
+                            }
+                            <div class="card-meta">
+                                @if (showDueDate && card.DueDate.HasValue)
+                                {
+                                    <span class="due-date @(card.DueDate.Value < DateTime.Now ? "overdue" : "")">
+                                        <Icon Name="schedule" Size="14px" />
+                                        @card.DueDate.Value.ToString("MMM dd")
+                                    </span>
+                                }
+                                @if (showAssignee && !string.IsNullOrEmpty(card.AssignedTo))
+                                {
+                                    <span class="assignee">@card.AssignedTo.Substring(0, 2).ToUpper()</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool showSettings = false;
+    private List<KanbanCard> cards = new();
+    
+    private List<string> statuses = new() { "Backlog", "Todo", "In Progress", "Review", "Done" };
+    private List<string> visibleColumns = new() { "Backlog", "Todo", "In Progress", "Review", "Done" };
+    
+    private List<string> themes = new() { "Default", "Ocean", "Sunset", "Forest" };
+    private string selectedTheme = "Default";
+    
+    private List<string> densities = new() { "Compact", "Comfortable", "Spacious" };
+    private string selectedDensity = "Comfortable";
+    
+    private List<string> sortOptions = new() { "Created Date", "Due Date", "Priority", "Title" };
+    private string selectedSort = "Created Date";
+    
+    private bool showAssignee = true;
+    private bool showDueDate = true;
+    private bool showTags = true;
+    private bool showPriority = true;
+
+    protected override void OnInitialized()
+    {
+        // Generate sample cards
+        var random = new Random(42);
+        var titles = new[] {
+            "Update user authentication", "Fix login bug", "Add dark mode support",
+            "Refactor API endpoints", "Write documentation", "Setup CI/CD pipeline",
+            "Design new landing page", "Implement search feature", "Optimize database queries",
+            "Add unit tests", "Review pull requests", "Update dependencies",
+            "Create mobile mockups", "Setup analytics", "Improve accessibility"
+        };
+        
+        var descriptions = new[] {
+            "Need to implement OAuth 2.0 for better security",
+            "Users are experiencing issues with password reset",
+            "Add theme toggle and persist user preference",
+            "Consolidate duplicate endpoints and improve naming",
+            "Update README with latest changes and examples"
+        };
+        
+        var tags = new[] { "frontend", "backend", "bug", "feature", "docs", "ui/ux", "security", "performance" };
+        var assignees = new[] { "JD", "AS", "MK", "LB", "TW", "RA" };
+        
+        for (int i = 0; i < 15; i++)
+        {
+            var statusIndex = random.Next(statuses.Count);
+            var priorityIndex = random.Next(3);
+            var priority = priorityIndex switch { 0 => "low", 1 => "medium", _ => "high" };
+            
+            var cardTags = new List<string>();
+            var tagCount = random.Next(0, 4);
+            for (int j = 0; j < tagCount; j++)
+            {
+                var tag = tags[random.Next(tags.Length)];
+                if (!cardTags.Contains(tag))
+                    cardTags.Add(tag);
+            }
+            
+            cards.Add(new KanbanCard
+            {
+                Id = i + 1,
+                Title = titles[i],
+                Description = i < descriptions.Length ? descriptions[i] : "",
+                Status = statuses[statusIndex],
+                Priority = priority,
+                AssignedTo = assignees[random.Next(assignees.Length)],
+                CreatedDate = DateTime.Now.AddDays(-random.Next(30)),
+                DueDate = random.Next(10) > 3 ? DateTime.Now.AddDays(random.Next(-5, 15)) : null,
+                Tags = cardTags
+            });
+        }
+    }
+
+    private void ToggleSettings()
+    {
+        showSettings = !showSettings;
+    }
+
+    private void ToggleColumn(string status, ChangeEventArgs e)
+    {
+        if ((bool)e.Value!)
+        {
+            if (!visibleColumns.Contains(status))
+                visibleColumns.Add(status);
+        }
+        else
+        {
+            visibleColumns.Remove(status);
+        }
+    }
+
+    private void ChangeTheme(string theme)
+    {
+        selectedTheme = theme;
+    }
+
+    private void ChangeDensity(string density)
+    {
+        selectedDensity = density;
+    }
+
+    private void ChangeSort(string sort)
+    {
+        selectedSort = sort;
+    }
+
+    private IEnumerable<KanbanCard> GetFilteredCards(string status)
+    {
+        var filtered = cards.Where(c => c.Status == status);
+        
+        return selectedSort switch
+        {
+            "Due Date" => filtered.OrderBy(c => c.DueDate ?? DateTime.MaxValue),
+            "Priority" => filtered.OrderByDescending(c => c.Priority == "high" ? 3 : c.Priority == "medium" ? 2 : 1),
+            "Title" => filtered.OrderBy(c => c.Title),
+            _ => filtered.OrderBy(c => c.CreatedDate)
+        };
+    }
+
+    private string GetStatusIcon(string status)
+    {
+        return status switch
+        {
+            "Backlog" => "inbox",
+            "Todo" => "radio_button_unchecked",
+            "In Progress" => "schedule",
+            "Review" => "rate_review",
+            "Done" => "check_circle",
+            _ => "circle"
+        };
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .settings-header h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .setting-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .setting-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #1e293b;
+    }
+
+    .checkbox-group, .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .checkbox-label, .radio-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: #475569;
+    }
+
+    .checkbox-label:hover, .radio-label:hover {
+        color: #1e293b;
+    }
+
+    .checkbox-label input, .radio-label input {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+    }
+
+    .kanban-board {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+    }
+
+    .kanban-column {
+        min-width: 320px;
+        max-width: 380px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f8fafc;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
+    .column-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .column-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .column-title h3 {
+        margin: 0;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #64748b;
+    }
+
+    .card-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.5rem;
+        height: 1.5rem;
+        padding: 0 0.375rem;
+        background: #cbd5e1;
+        color: #475569;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .column-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-height: 100px;
+    }
+
+    .kanban-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .kanban-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-priority {
+        margin-bottom: 0.5rem;
+    }
+
+    .priority-indicator {
+        display: inline-block;
+        width: 100%;
+        height: 3px;
+        border-radius: 2px;
+    }
+
+    .priority-indicator.priority-high {
+        background: #ef4444;
+    }
+
+    .priority-indicator.priority-medium {
+        background: #f59e0b;
+    }
+
+    .priority-indicator.priority-low {
+        background: #10b981;
+    }
+
+    .card-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+        margin: 0;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+        line-height: 1.4;
+    }
+
+    .card-menu {
+        color: #94a3b8;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .card-menu:hover {
+        color: #64748b;
+    }
+
+    .card-description {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.8125rem;
+        color: #64748b;
+        line-height: 1.5;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .card-tags {
+        display: flex;
+        gap: 0.375rem;
+        flex-wrap: wrap;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        background: #f1f5f9;
+        color: #475569;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+    }
+
+    .due-date {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .due-date.overdue {
+        color: #ef4444;
+    }
+
+    .assignee {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        background: #6366f1;
+        color: white;
+        border-radius: 9999px;
+        font-size: 0.625rem;
+        font-weight: 600;
+    }
+
+    /* Theme variations */
+    .theme-Ocean .kanban-column {
+        background: #e0f2fe;
+    }
+
+    .theme-Ocean .column-title h3 {
+        color: #0369a1;
+    }
+
+    .theme-Sunset .kanban-column {
+        background: #fef3c7;
+    }
+
+    .theme-Sunset .column-title h3 {
+        color: #92400e;
+    }
+
+    .theme-Forest .kanban-column {
+        background: #dcfce7;
+    }
+
+    .theme-Forest .column-title h3 {
+        color: #166534;
+    }
+
+    /* Density variations */
+    .density-Compact .kanban-card {
+        padding: 0.75rem;
+    }
+
+    .density-Compact .card-title {
+        font-size: 0.8125rem;
+    }
+
+    .density-Compact .card-description {
+        font-size: 0.75rem;
+    }
+
+    .density-Spacious .kanban-card {
+        padding: 1.25rem;
+    }
+
+    .density-Spacious .card-title {
+        font-size: 1rem;
+    }
+
+    .density-Spacious .column-content {
+        gap: 1rem;
+    }
+</style>
