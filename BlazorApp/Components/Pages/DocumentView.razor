@@ -40,7 +40,7 @@ else if (selectedDocument == null)
                                 <p class="document-description">@doc.Description</p>
                                 <div class="document-meta">
                                     <span class="document-status @GetStatusClass(doc.Status)">@doc.Status</span>
-                                    <span class="document-info">v@doc.Version • @doc.Author • @FormatDate(doc.LastModified)</span>
+                                    <span class="document-info">v@(doc.Version) • @doc.Author • @FormatDate(doc.LastModified)</span>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +106,7 @@ else
                             </div>
                             <div class="status-detail-item">
                                 <span class="label">Version:</span>
-                                <span class="value">v@selectedDocument.Version</span>
+                                <span class="value">v@(selectedDocument.Version)</span>
                             </div>
                             <div class="status-detail-item">
                                 <span class="label">Size:</span>
