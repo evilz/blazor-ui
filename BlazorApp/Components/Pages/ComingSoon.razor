@@ -1,0 +1,330 @@
+@page "/coming-soon"
+@rendermode InteractiveServer
+
+<PageTitle>Coming Soon - Blazor UI</PageTitle>
+
+<div class="coming-soon-container">
+    <div class="coming-soon-content">
+        <div class="coming-soon-badge">
+            <Icon Name="schedule" Size="24px" />
+            <span>Coming Soon</span>
+        </div>
+        
+        <h1 class="coming-soon-title">We're launching soon</h1>
+        
+        <p class="coming-soon-description">
+            We're working hard to bring you something amazing. 
+            Enter your email to be notified when we launch.
+        </p>
+        
+        <div class="countdown-timer">
+            <div class="countdown-item">
+                <div class="countdown-value">@days</div>
+                <div class="countdown-label">Days</div>
+            </div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-item">
+                <div class="countdown-value">@hours</div>
+                <div class="countdown-label">Hours</div>
+            </div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-item">
+                <div class="countdown-value">@minutes</div>
+                <div class="countdown-label">Minutes</div>
+            </div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-item">
+                <div class="countdown-value">@seconds</div>
+                <div class="countdown-label">Seconds</div>
+            </div>
+        </div>
+        
+        <Card Width="100%" Style="max-width: 500px; margin-top: 2rem;">
+            <CardContent>
+                <div class="notify-form">
+                    <Input TItem="string" 
+                           Type="email" 
+                           Placeholder="Enter your email" 
+                           @bind-Value="email" 
+                           Style="flex: 1;" />
+                    <Button Text="Notify Me" OnClick="HandleSubscribe" />
+                </div>
+                @if (!string.IsNullOrEmpty(message))
+                {
+                    <div class="@(isSuccess ? "success-message" : "error-message")">
+                        @message
+                    </div>
+                }
+            </CardContent>
+        </Card>
+        
+        <div class="social-links">
+            <small class="muted-color">Follow us on</small>
+            <div class="social-icons">
+                <a href="#" class="social-icon" title="Twitter">
+                    <Icon Name="X" Type="IconType.Lucide" Size="20px" />
+                </a>
+                <a href="#" class="social-icon" title="GitHub">
+                    <Icon Name="github" Type="IconType.Lucide" Size="20px" />
+                </a>
+                <a href="#" class="social-icon" title="LinkedIn">
+                    <Icon Name="linkedin" Type="IconType.Lucide" Size="20px" />
+                </a>
+                <a href="#" class="social-icon" title="YouTube">
+                    <Icon Name="youtube" Type="IconType.Lucide" Size="20px" />
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string email = "";
+    private string message = "";
+    private bool isSuccess = false;
+    
+    // Countdown to a future date (30 days from now for demo)
+    private DateTime launchDate = DateTime.Now.AddDays(30);
+    private int days = 0;
+    private int hours = 0;
+    private int minutes = 0;
+    private int seconds = 0;
+    
+    private System.Threading.Timer? timer;
+    
+    protected override void OnInitialized()
+    {
+        UpdateCountdown();
+        timer = new System.Threading.Timer(async _ =>
+        {
+            UpdateCountdown();
+            await InvokeAsync(StateHasChanged);
+        }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+    
+    private void UpdateCountdown()
+    {
+        var timeRemaining = launchDate - DateTime.Now;
+        
+        if (timeRemaining.TotalSeconds > 0)
+        {
+            days = timeRemaining.Days;
+            hours = timeRemaining.Hours;
+            minutes = timeRemaining.Minutes;
+            seconds = timeRemaining.Seconds;
+        }
+        else
+        {
+            days = hours = minutes = seconds = 0;
+        }
+    }
+    
+    private void HandleSubscribe()
+    {
+        message = "";
+        isSuccess = false;
+        
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            message = "Please enter your email address.";
+            return;
+        }
+        
+        if (!IsValidEmail(email))
+        {
+            message = "Please enter a valid email address.";
+            return;
+        }
+        
+        // Simulate successful subscription
+        message = "Thank you! You'll be notified when we launch.";
+        isSuccess = true;
+        email = "";
+    }
+    
+    private bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}
+
+<style>
+    .coming-soon-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem;
+    }
+    
+    .coming-soon-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 700px;
+        width: 100%;
+    }
+    
+    .coming-soon-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #f1f5f9;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #475569;
+        margin-bottom: 1.5rem;
+    }
+    
+    .coming-soon-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        color: #1e293b;
+        line-height: 1.2;
+    }
+    
+    .coming-soon-description {
+        font-size: 1.125rem;
+        color: #64748b;
+        margin: 0 0 2rem 0;
+        line-height: 1.6;
+    }
+    
+    .countdown-timer {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .countdown-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 70px;
+    }
+    
+    .countdown-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+    
+    .countdown-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+    
+    .countdown-separator {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #cbd5e1;
+        margin: 0 0.25rem;
+        align-self: flex-start;
+        line-height: 1.2;
+    }
+    
+    .notify-form {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+    
+    .success-message {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background-color: #dcfce7;
+        border: 1px solid #86efac;
+        border-radius: 0.375rem;
+        color: #166534;
+        font-size: 0.875rem;
+    }
+    
+    .error-message {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background-color: #fee;
+        border: 1px solid #fcc;
+        border-radius: 0.375rem;
+        color: #c00;
+        font-size: 0.875rem;
+    }
+    
+    .social-links {
+        margin-top: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .muted-color {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+    
+    .social-icons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .social-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        background: #f1f5f9;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .social-icon:hover {
+        background: #6366f1;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    @@media (max-width: 640px) {
+        .coming-soon-title {
+            font-size: 2rem;
+        }
+        
+        .countdown-value {
+            font-size: 1.75rem;
+        }
+        
+        .countdown-item {
+            min-width: 50px;
+        }
+        
+        .notify-form {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
+</style>
