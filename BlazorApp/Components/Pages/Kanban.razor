@@ -173,7 +173,7 @@
                                 }
                                 @if (showAssignee && !string.IsNullOrEmpty(card.AssignedTo))
                                 {
-                                    <span class="assignee">@card.AssignedTo.Substring(0, 2).ToUpper()</span>
+                                    <span class="assignee">@(card.AssignedTo.Length >= 2 ? card.AssignedTo.Substring(0, 2).ToUpper() : card.AssignedTo.ToUpper())</span>
                                 }
                             </div>
                         </div>
@@ -204,6 +204,13 @@
     private bool showDueDate = true;
     private bool showTags = true;
     private bool showPriority = true;
+
+    // Constants for sample data generation
+    private const int MaxDaysInPast = 30;
+    private const int DueDateThreshold = 10;
+    private const int DueDateMinDays = -5;
+    private const int DueDateMaxDays = 15;
+    private const int DueDateThresholdValue = 3;
 
     protected override void OnInitialized()
     {
@@ -251,8 +258,10 @@
                 Status = statuses[statusIndex],
                 Priority = priority,
                 AssignedTo = assignees[random.Next(assignees.Length)],
-                CreatedDate = DateTime.Now.AddDays(-random.Next(30)),
-                DueDate = random.Next(10) > 3 ? DateTime.Now.AddDays(random.Next(-5, 15)) : null,
+                CreatedDate = DateTime.Now.AddDays(-random.Next(MaxDaysInPast)),
+                DueDate = random.Next(DueDateThreshold) > DueDateThresholdValue 
+                    ? DateTime.Now.AddDays(random.Next(DueDateMinDays, DueDateMaxDays)) 
+                    : null,
                 Tags = cardTags
             });
         }
