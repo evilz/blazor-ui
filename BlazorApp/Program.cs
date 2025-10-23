@@ -26,6 +26,9 @@ builder.Services.AddScoped<IMailService, MockMailService>();
 // Add Calendar service
 builder.Services.AddScoped<ICalendarService, MockCalendarService>();
 
+// Add Document service
+builder.Services.AddScoped<IDocumentService, MockDocumentService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
