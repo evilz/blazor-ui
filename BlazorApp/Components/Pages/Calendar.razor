@@ -1,0 +1,1289 @@
+@page "/calendar"
+@rendermode InteractiveServer
+@inject ICalendarService CalendarService
+@using BlazorApp.Models
+@using BlazorApp.Services
+
+<PageTitle>Calendar - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <h1>Calendar</h1>
+    <p>Manage your events and meetings</p>
+</div>
+
+<div class="calendar-container">
+    <div class="calendar-toolbar">
+        <div class="calendar-nav">
+            <Button Icon="chevron_left" Type="ButtonType.Secondary" Size="ButtonSize.Small" OnClick="PreviousPeriod" />
+            <Button Text="Today" Type="ButtonType.Secondary" Size="ButtonSize.Small" OnClick="GoToToday" />
+            <Button Icon="chevron_right" Type="ButtonType.Secondary" Size="ButtonSize.Small" OnClick="NextPeriod" />
+            <h2 class="calendar-title">@GetPeriodTitle()</h2>
+        </div>
+        <div class="calendar-actions">
+            <div class="view-selector">
+                <Button Text="Day" Type="@(currentView == CalendarView.Day ? ButtonType.Primary : ButtonType.Secondary)" 
+                        Size="ButtonSize.Small" OnClick="() => ChangeView(CalendarView.Day)" />
+                <Button Text="Week" Type="@(currentView == CalendarView.Week ? ButtonType.Primary : ButtonType.Secondary)" 
+                        Size="ButtonSize.Small" OnClick="() => ChangeView(CalendarView.Week)" />
+                <Button Text="Month" Type="@(currentView == CalendarView.Month ? ButtonType.Primary : ButtonType.Secondary)" 
+                        Size="ButtonSize.Small" OnClick="() => ChangeView(CalendarView.Month)" />
+                <Button Text="Agenda" Type="@(currentView == CalendarView.Agenda ? ButtonType.Primary : ButtonType.Secondary)" 
+                        Size="ButtonSize.Small" OnClick="() => ChangeView(CalendarView.Agenda)" />
+            </div>
+            <Button Text="New Event" Icon="add" OnClick="ShowCreateEventDialog" />
+        </div>
+    </div>
+
+    <div class="calendar-view">
+        @if (isLoading)
+        {
+            <div class="loading">Loading events...</div>
+        }
+        else
+        {
+            @switch (currentView)
+            {
+                case CalendarView.Day:
+                    @DayView
+                    break;
+                case CalendarView.Week:
+                    @WeekView
+                    break;
+                case CalendarView.Month:
+                    @MonthView
+                    break;
+                case CalendarView.Agenda:
+                    @AgendaView
+                    break;
+            }
+        }
+    </div>
+</div>
+
+@if (showEventDialog)
+{
+    <div class="event-overlay" @onclick="CloseEventDialog">
+        <div class="event-dialog" @onclick:stopPropagation="true">
+            <div class="event-dialog-header">
+                <h3>@(editingEvent?.Id > 0 ? "Edit Event" : "New Event")</h3>
+                <Icon Name="close" Size="20px" OnClick="CloseEventDialog" />
+            </div>
+            <div class="event-dialog-body">
+                <div class="event-field">
+                    <label>Title:</label>
+                    <Input @bind-Value="editingEvent!.Title" Placeholder="Event title" />
+                </div>
+                <div class="event-field">
+                    <label>Description:</label>
+                    <textarea @bind="editingEvent!.Description" rows="3" placeholder="Add description..."></textarea>
+                </div>
+                <div class="event-field-row">
+                    <div class="event-field">
+                        <label>Start Time:</label>
+                        <input type="datetime-local" @bind="editingEvent!.StartTime" />
+                    </div>
+                    <div class="event-field">
+                        <label>End Time:</label>
+                        <input type="datetime-local" @bind="editingEvent!.EndTime" />
+                    </div>
+                </div>
+                <div class="event-field">
+                    <label>Location:</label>
+                    <Input @bind-Value="editingEvent!.Location" Placeholder="Add location or meeting link" />
+                </div>
+                <div class="event-field-row">
+                    <div class="event-field">
+                        <label>Category:</label>
+                        <select @bind="editingEvent!.Category">
+                            <option value="Meeting">Meeting</option>
+                            <option value="Appointment">Appointment</option>
+                            <option value="Event">Event</option>
+                            <option value="Reminder">Reminder</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="event-field">
+                        <label>Color:</label>
+                        <select @bind="editingEvent!.Color">
+                            <option value="#3b82f6">Blue</option>
+                            <option value="#8b5cf6">Purple</option>
+                            <option value="#ec4899">Pink</option>
+                            <option value="#10b981">Green</option>
+                            <option value="#f59e0b">Orange</option>
+                            <option value="#ef4444">Red</option>
+                            <option value="#6366f1">Indigo</option>
+                            <option value="#64748b">Gray</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="event-field-check">
+                    <label>
+                        <input type="checkbox" @bind="editingEvent!.IsAllDay" />
+                        All day event
+                    </label>
+                    <label>
+                        <input type="checkbox" @bind="editingEvent!.IsOnline" />
+                        Online meeting
+                    </label>
+                </div>
+            </div>
+            <div class="event-dialog-footer">
+                <Button Text="Save" Icon="check" OnClick="SaveEvent" />
+                <Button Text="Cancel" Type="ButtonType.Secondary" OnClick="CloseEventDialog" />
+                @if (editingEvent?.Id > 0)
+                {
+                    <Button Text="Delete" Type="ButtonType.Destructive" Icon="delete" OnClick="DeleteEvent" />
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (selectedEvent != null && !showEventDialog)
+{
+    <div class="event-overlay" @onclick="CloseEventDetail">
+        <div class="event-detail" @onclick:stopPropagation="true">
+            <div class="event-detail-header" style="background: @selectedEvent.Color">
+                <div>
+                    <h3>@selectedEvent.Title</h3>
+                    <p>@selectedEvent.StartTime.ToString("dddd, MMMM d, yyyy")</p>
+                </div>
+                <Icon Name="close" Size="20px" OnClick="CloseEventDetail" />
+            </div>
+            <div class="event-detail-body">
+                <div class="event-detail-section">
+                    <Icon Name="schedule" Size="20px" />
+                    <div>
+                        <strong>Time:</strong>
+                        <p>@FormatEventTime(selectedEvent)</p>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(selectedEvent.Location))
+                {
+                    <div class="event-detail-section">
+                        <Icon Name="@(selectedEvent.IsOnline ? "videocam" : "location_on")" Size="20px" />
+                        <div>
+                            <strong>Location:</strong>
+                            <p>@selectedEvent.Location</p>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(selectedEvent.Description))
+                {
+                    <div class="event-detail-section">
+                        <Icon Name="description" Size="20px" />
+                        <div>
+                            <strong>Description:</strong>
+                            <p>@selectedEvent.Description</p>
+                        </div>
+                    </div>
+                }
+                <div class="event-detail-section">
+                    <Icon Name="person" Size="20px" />
+                    <div>
+                        <strong>Organizer:</strong>
+                        <p>@selectedEvent.Organizer</p>
+                    </div>
+                </div>
+                @if (selectedEvent.Attendees.Count > 0)
+                {
+                    <div class="event-detail-section">
+                        <Icon Name="group" Size="20px" />
+                        <div>
+                            <strong>Attendees:</strong>
+                            <p>@string.Join(", ", selectedEvent.Attendees)</p>
+                        </div>
+                    </div>
+                }
+                @if (selectedEvent.IsOnline && !string.IsNullOrEmpty(selectedEvent.MeetingLink))
+                {
+                    <div class="event-detail-section">
+                        <Icon Name="link" Size="20px" />
+                        <div>
+                            <strong>Meeting Link:</strong>
+                            <p><a href="@selectedEvent.MeetingLink" target="_blank">Join Meeting</a></p>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="event-detail-footer">
+                <Button Text="Edit" Icon="edit" OnClick="EditEvent" />
+                <Button Text="Delete" Type="ButtonType.Destructive" Icon="delete" OnClick="DeleteEventFromDetail" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private enum CalendarView { Day, Week, Month, Agenda }
+    
+    private List<CalendarEvent> events = new();
+    private CalendarEvent? selectedEvent = null;
+    private CalendarEvent? editingEvent = null;
+    private CalendarView currentView = CalendarView.Month;
+    private DateTime currentDate = DateTime.Today;
+    private bool isLoading = false;
+    private bool showEventDialog = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+    }
+
+    private async Task LoadEvents()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        // Load events for the visible period with some buffer
+        var startDate = GetPeriodStart().AddDays(-7);
+        var endDate = GetPeriodEnd().AddDays(7);
+        events = await CalendarService.GetEventsAsync(startDate, endDate);
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private DateTime GetPeriodStart()
+    {
+        return currentView switch
+        {
+            CalendarView.Day => currentDate.Date,
+            CalendarView.Week => currentDate.AddDays(-(int)currentDate.DayOfWeek),
+            CalendarView.Month => new DateTime(currentDate.Year, currentDate.Month, 1),
+            CalendarView.Agenda => currentDate.Date,
+            _ => currentDate.Date
+        };
+    }
+
+    private DateTime GetPeriodEnd()
+    {
+        return currentView switch
+        {
+            CalendarView.Day => currentDate.Date.AddDays(1),
+            CalendarView.Week => GetPeriodStart().AddDays(7),
+            CalendarView.Month => new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1),
+            CalendarView.Agenda => currentDate.Date.AddDays(30),
+            _ => currentDate.Date.AddDays(1)
+        };
+    }
+
+    private string GetPeriodTitle()
+    {
+        return currentView switch
+        {
+            CalendarView.Day => currentDate.ToString("MMMM d, yyyy"),
+            CalendarView.Week => $"{GetPeriodStart():MMM d} - {GetPeriodEnd().AddDays(-1):MMM d, yyyy}",
+            CalendarView.Month => currentDate.ToString("MMMM yyyy"),
+            CalendarView.Agenda => "Upcoming Events",
+            _ => currentDate.ToString("MMMM yyyy")
+        };
+    }
+
+    private async Task ChangeView(CalendarView view)
+    {
+        currentView = view;
+        await LoadEvents();
+    }
+
+    private async Task PreviousPeriod()
+    {
+        currentDate = currentView switch
+        {
+            CalendarView.Day => currentDate.AddDays(-1),
+            CalendarView.Week => currentDate.AddDays(-7),
+            CalendarView.Month => currentDate.AddMonths(-1),
+            CalendarView.Agenda => currentDate.AddDays(-30),
+            _ => currentDate
+        };
+        await LoadEvents();
+    }
+
+    private async Task NextPeriod()
+    {
+        currentDate = currentView switch
+        {
+            CalendarView.Day => currentDate.AddDays(1),
+            CalendarView.Week => currentDate.AddDays(7),
+            CalendarView.Month => currentDate.AddMonths(1),
+            CalendarView.Agenda => currentDate.AddDays(30),
+            _ => currentDate
+        };
+        await LoadEvents();
+    }
+
+    private async Task GoToToday()
+    {
+        currentDate = DateTime.Today;
+        await LoadEvents();
+    }
+
+    private void ShowCreateEventDialog()
+    {
+        editingEvent = new CalendarEvent
+        {
+            StartTime = currentDate.Date.AddHours(9),
+            EndTime = currentDate.Date.AddHours(10),
+            Color = "#3b82f6",
+            Category = "Meeting"
+        };
+        showEventDialog = true;
+    }
+
+    private void EditEvent()
+    {
+        if (selectedEvent != null)
+        {
+            editingEvent = new CalendarEvent
+            {
+                Id = selectedEvent.Id,
+                Title = selectedEvent.Title,
+                Description = selectedEvent.Description,
+                StartTime = selectedEvent.StartTime,
+                EndTime = selectedEvent.EndTime,
+                Location = selectedEvent.Location,
+                Organizer = selectedEvent.Organizer,
+                Attendees = new List<string>(selectedEvent.Attendees),
+                Category = selectedEvent.Category,
+                Color = selectedEvent.Color,
+                IsAllDay = selectedEvent.IsAllDay,
+                IsOnline = selectedEvent.IsOnline,
+                MeetingLink = selectedEvent.MeetingLink
+            };
+            selectedEvent = null;
+            showEventDialog = true;
+        }
+    }
+
+    private async Task SaveEvent()
+    {
+        if (editingEvent != null)
+        {
+            if (editingEvent.Id > 0)
+            {
+                await CalendarService.UpdateEventAsync(editingEvent);
+            }
+            else
+            {
+                await CalendarService.CreateEventAsync(editingEvent);
+            }
+            await LoadEvents();
+            CloseEventDialog();
+        }
+    }
+
+    private async Task DeleteEvent()
+    {
+        if (editingEvent?.Id > 0)
+        {
+            await CalendarService.DeleteEventAsync(editingEvent.Id);
+            await LoadEvents();
+            CloseEventDialog();
+        }
+    }
+
+    private async Task DeleteEventFromDetail()
+    {
+        if (selectedEvent?.Id > 0)
+        {
+            await CalendarService.DeleteEventAsync(selectedEvent.Id);
+            await LoadEvents();
+            CloseEventDetail();
+        }
+    }
+
+    private void CloseEventDialog()
+    {
+        showEventDialog = false;
+        editingEvent = null;
+    }
+
+    private void CloseEventDetail()
+    {
+        selectedEvent = null;
+    }
+
+    private void SelectEvent(CalendarEvent evt)
+    {
+        selectedEvent = evt;
+    }
+
+    private string FormatEventTime(CalendarEvent evt)
+    {
+        if (evt.IsAllDay)
+            return "All day";
+        return $"{evt.StartTime:h:mm tt} - {evt.EndTime:h:mm tt}";
+    }
+
+    // Month View Component
+    private RenderFragment MonthView => builder =>
+    {
+        var monthStart = new DateTime(currentDate.Year, currentDate.Month, 1);
+        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+        var firstDayOfWeek = monthStart.DayOfWeek;
+        var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+        
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "month-view");
+        
+        // Day headers
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(3, "class", "month-header");
+        foreach (var day in new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" })
+        {
+            builder.OpenElement(4, "div");
+            builder.AddAttribute(5, "class", "day-header");
+            builder.AddContent(6, day);
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+        
+        // Days grid
+        builder.OpenElement(7, "div");
+        builder.AddAttribute(8, "class", "month-grid");
+        
+        // Empty cells before first day
+        for (int i = 0; i < (int)firstDayOfWeek; i++)
+        {
+            builder.OpenElement(9, "div");
+            builder.AddAttribute(10, "class", "day-cell empty");
+            builder.CloseElement();
+        }
+        
+        // Days of month
+        for (int day = 1; day <= daysInMonth; day++)
+        {
+            var date = new DateTime(currentDate.Year, currentDate.Month, day);
+            var dayEvents = events.Where(e => e.StartTime.Date == date.Date).OrderBy(e => e.StartTime).ToList();
+            var isToday = date.Date == DateTime.Today;
+            
+            builder.OpenElement(11, "div");
+            builder.AddAttribute(12, "class", $"day-cell{(isToday ? " today" : "")}");
+            
+            builder.OpenElement(13, "div");
+            builder.AddAttribute(14, "class", "day-number");
+            builder.AddContent(15, day);
+            builder.CloseElement();
+            
+            builder.OpenElement(16, "div");
+            builder.AddAttribute(17, "class", "day-events");
+            
+            var visibleEvents = dayEvents.Take(3).ToList();
+            foreach (var evt in visibleEvents)
+            {
+                builder.OpenElement(18, "div");
+                builder.AddAttribute(19, "class", "month-event");
+                builder.AddAttribute(20, "style", $"background: {evt.Color}20; border-left: 3px solid {evt.Color};");
+                builder.AddAttribute(21, "onclick", EventCallback.Factory.Create(this, () => SelectEvent(evt)));
+                
+                builder.OpenElement(22, "span");
+                builder.AddAttribute(23, "class", "event-time");
+                builder.AddContent(24, evt.IsAllDay ? "All day" : evt.StartTime.ToString("h:mm tt"));
+                builder.CloseElement();
+                
+                builder.AddContent(25, " ");
+                builder.AddContent(26, evt.Title);
+                builder.CloseElement();
+            }
+            
+            if (dayEvents.Count > 3)
+            {
+                builder.OpenElement(27, "div");
+                builder.AddAttribute(28, "class", "more-events");
+                builder.AddContent(29, $"+{dayEvents.Count - 3} more");
+                builder.CloseElement();
+            }
+            
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    // Week View Component
+    private RenderFragment WeekView => builder =>
+    {
+        var weekStart = currentDate.AddDays(-(int)currentDate.DayOfWeek);
+        var hours = Enumerable.Range(0, 24).ToList();
+        
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "week-view");
+        
+        // Time column header
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(3, "class", "week-header");
+        builder.OpenElement(4, "div");
+        builder.AddAttribute(5, "class", "time-header");
+        builder.CloseElement();
+        
+        // Day headers
+        for (int i = 0; i < 7; i++)
+        {
+            var date = weekStart.AddDays(i);
+            var isToday = date.Date == DateTime.Today;
+            
+            builder.OpenElement(6, "div");
+            builder.AddAttribute(7, "class", $"day-header{(isToday ? " today" : "")}");
+            builder.OpenElement(8, "div");
+            builder.AddAttribute(9, "class", "day-name");
+            builder.AddContent(10, date.ToString("ddd"));
+            builder.CloseElement();
+            builder.OpenElement(11, "div");
+            builder.AddAttribute(12, "class", "day-date");
+            builder.AddContent(13, date.Day);
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+        
+        // Time slots
+        builder.OpenElement(14, "div");
+        builder.AddAttribute(15, "class", "week-grid");
+        
+        foreach (var hour in hours)
+        {
+            builder.OpenElement(16, "div");
+            builder.AddAttribute(17, "class", "time-row");
+            
+            builder.OpenElement(18, "div");
+            builder.AddAttribute(19, "class", "time-label");
+            builder.AddContent(20, hour == 0 ? "12 AM" : hour < 12 ? $"{hour} AM" : hour == 12 ? "12 PM" : $"{hour - 12} PM");
+            builder.CloseElement();
+            
+            for (int i = 0; i < 7; i++)
+            {
+                var date = weekStart.AddDays(i);
+                var slotStart = date.AddHours(hour);
+                var slotEnd = slotStart.AddHours(1);
+                var slotEvents = events.Where(e => 
+                    !e.IsAllDay && 
+                    e.StartTime.Date == date.Date &&
+                    e.StartTime.Hour == hour
+                ).ToList();
+                
+                builder.OpenElement(21, "div");
+                builder.AddAttribute(22, "class", "time-slot");
+                
+                foreach (var evt in slotEvents)
+                {
+                    builder.OpenElement(23, "div");
+                    builder.AddAttribute(24, "class", "week-event");
+                    builder.AddAttribute(25, "style", $"background: {evt.Color}; color: white;");
+                    builder.AddAttribute(26, "onclick", EventCallback.Factory.Create(this, () => SelectEvent(evt)));
+                    builder.AddContent(27, evt.Title);
+                    builder.CloseElement();
+                }
+                
+                builder.CloseElement();
+            }
+            
+            builder.CloseElement();
+        }
+        
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    // Day View Component
+    private RenderFragment DayView => builder =>
+    {
+        var hours = Enumerable.Range(0, 24).ToList();
+        
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "day-view");
+        
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(3, "class", "day-header");
+        builder.OpenElement(4, "h3");
+        builder.AddContent(5, currentDate.ToString("dddd, MMMM d, yyyy"));
+        builder.CloseElement();
+        builder.CloseElement();
+        
+        builder.OpenElement(6, "div");
+        builder.AddAttribute(7, "class", "day-grid");
+        
+        foreach (var hour in hours)
+        {
+            var slotStart = currentDate.Date.AddHours(hour);
+            var slotEnd = slotStart.AddHours(1);
+            var slotEvents = events.Where(e => 
+                !e.IsAllDay && 
+                e.StartTime.Date == currentDate.Date &&
+                e.StartTime.Hour == hour
+            ).ToList();
+            
+            builder.OpenElement(8, "div");
+            builder.AddAttribute(9, "class", "time-row");
+            
+            builder.OpenElement(10, "div");
+            builder.AddAttribute(11, "class", "time-label");
+            builder.AddContent(12, hour == 0 ? "12 AM" : hour < 12 ? $"{hour} AM" : hour == 12 ? "12 PM" : $"{hour - 12} PM");
+            builder.CloseElement();
+            
+            builder.OpenElement(13, "div");
+            builder.AddAttribute(14, "class", "time-slot");
+            
+            foreach (var evt in slotEvents)
+            {
+                builder.OpenElement(15, "div");
+                builder.AddAttribute(16, "class", "day-event");
+                builder.AddAttribute(17, "style", $"background: {evt.Color}; color: white;");
+                builder.AddAttribute(18, "onclick", EventCallback.Factory.Create(this, () => SelectEvent(evt)));
+                
+                builder.OpenElement(19, "div");
+                builder.AddAttribute(20, "class", "event-title");
+                builder.AddContent(21, evt.Title);
+                builder.CloseElement();
+                
+                builder.OpenElement(22, "div");
+                builder.AddAttribute(23, "class", "event-time");
+                builder.AddContent(24, $"{evt.StartTime:h:mm tt} - {evt.EndTime:h:mm tt}");
+                builder.CloseElement();
+                
+                builder.CloseElement();
+            }
+            
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    // Agenda View Component
+    private RenderFragment AgendaView => builder =>
+    {
+        var upcomingEvents = events
+            .Where(e => e.StartTime >= DateTime.Now)
+            .OrderBy(e => e.StartTime)
+            .Take(20)
+            .GroupBy(e => e.StartTime.Date)
+            .ToList();
+        
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "agenda-view");
+        
+        if (!upcomingEvents.Any())
+        {
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(3, "class", "empty-state");
+            builder.AddContent(4, "No upcoming events");
+            builder.CloseElement();
+        }
+        else
+        {
+            foreach (var dayGroup in upcomingEvents)
+            {
+                builder.OpenElement(5, "div");
+                builder.AddAttribute(6, "class", "agenda-day");
+                
+                builder.OpenElement(7, "div");
+                builder.AddAttribute(8, "class", "agenda-date");
+                builder.AddContent(9, dayGroup.Key.ToString("dddd, MMMM d, yyyy"));
+                builder.CloseElement();
+                
+                builder.OpenElement(10, "div");
+                builder.AddAttribute(11, "class", "agenda-events");
+                
+                foreach (var evt in dayGroup)
+                {
+                    builder.OpenElement(12, "div");
+                    builder.AddAttribute(13, "class", "agenda-event");
+                    builder.AddAttribute(14, "onclick", EventCallback.Factory.Create(this, () => SelectEvent(evt)));
+                    
+                    builder.OpenElement(15, "div");
+                    builder.AddAttribute(16, "class", "agenda-event-time");
+                    builder.AddAttribute(17, "style", $"border-left: 4px solid {evt.Color};");
+                    builder.AddContent(18, FormatEventTime(evt));
+                    builder.CloseElement();
+                    
+                    builder.OpenElement(19, "div");
+                    builder.AddAttribute(20, "class", "agenda-event-details");
+                    
+                    builder.OpenElement(21, "div");
+                    builder.AddAttribute(22, "class", "agenda-event-title");
+                    builder.AddContent(23, evt.Title);
+                    builder.CloseElement();
+                    
+                    if (!string.IsNullOrEmpty(evt.Location))
+                    {
+                        builder.OpenElement(24, "div");
+                        builder.AddAttribute(25, "class", "agenda-event-location");
+                        builder.AddContent(26, "📍 ");
+                        builder.AddContent(27, evt.Location);
+                        builder.CloseElement();
+                    }
+                    
+                    builder.CloseElement();
+                    builder.CloseElement();
+                }
+                
+                builder.CloseElement();
+                builder.CloseElement();
+            }
+        }
+        
+        builder.CloseElement();
+    };
+}
+
+<style>
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .calendar-container {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+
+    .calendar-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .calendar-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .calendar-title {
+        margin: 0 0 0 1rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .calendar-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .view-selector {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .calendar-view {
+        padding: 1rem;
+        min-height: 600px;
+    }
+
+    /* Month View Styles */
+    .month-view {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .month-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 0.5rem;
+    }
+
+    .day-header {
+        padding: 0.75rem;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .month-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background: #e2e8f0;
+        border: 1px solid #e2e8f0;
+    }
+
+    .day-cell {
+        background: white;
+        min-height: 120px;
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .day-cell.empty {
+        background: #f8fafc;
+    }
+
+    .day-cell.today {
+        background: #eff6ff;
+    }
+
+    .day-cell.today .day-number {
+        background: #3b82f6;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .day-number {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+        font-size: 0.875rem;
+    }
+
+    .day-events {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow: hidden;
+    }
+
+    .month-event {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .month-event:hover {
+        opacity: 0.8;
+    }
+
+    .event-time {
+        font-weight: 600;
+    }
+
+    .more-events {
+        font-size: 0.75rem;
+        color: #64748b;
+        padding: 2px 6px;
+        cursor: pointer;
+    }
+
+    /* Week View Styles */
+    .week-view {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .week-header {
+        display: grid;
+        grid-template-columns: 80px repeat(7, 1fr);
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 0.5rem;
+    }
+
+    .time-header {
+        padding: 0.75rem;
+    }
+
+    .week-header .day-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.75rem;
+        border-left: 1px solid #e2e8f0;
+    }
+
+    .week-header .day-header.today {
+        background: #eff6ff;
+    }
+
+    .day-name {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .day-date {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-top: 0.25rem;
+    }
+
+    .week-header .day-header.today .day-date {
+        background: #3b82f6;
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .week-grid {
+        overflow-y: auto;
+        max-height: 600px;
+    }
+
+    .time-row {
+        display: grid;
+        grid-template-columns: 80px repeat(7, 1fr);
+        border-bottom: 1px solid #e2e8f0;
+        min-height: 60px;
+    }
+
+    .time-label {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        color: #64748b;
+        text-align: right;
+        padding-right: 1rem;
+    }
+
+    .time-slot {
+        border-left: 1px solid #e2e8f0;
+        padding: 2px;
+        position: relative;
+    }
+
+    .week-event {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 2px;
+        cursor: pointer;
+    }
+
+    .week-event:hover {
+        opacity: 0.9;
+    }
+
+    /* Day View Styles */
+    .day-view {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .day-view .day-header {
+        padding: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 1rem;
+    }
+
+    .day-view .day-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .day-grid {
+        overflow-y: auto;
+        max-height: 600px;
+    }
+
+    .day-view .time-row {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        border-bottom: 1px solid #e2e8f0;
+        min-height: 60px;
+    }
+
+    .day-event {
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin: 4px;
+        cursor: pointer;
+    }
+
+    .day-event:hover {
+        opacity: 0.9;
+    }
+
+    .day-event .event-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .day-event .event-time {
+        font-size: 0.75rem;
+        opacity: 0.9;
+    }
+
+    /* Agenda View Styles */
+    .agenda-view {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .agenda-day {
+        margin-bottom: 2rem;
+    }
+
+    .agenda-date {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .agenda-events {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .agenda-event {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 6px;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .agenda-event:hover {
+        background: #f1f5f9;
+    }
+
+    .agenda-event-time {
+        min-width: 120px;
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+        padding-left: 0.75rem;
+    }
+
+    .agenda-event-details {
+        flex: 1;
+    }
+
+    .agenda-event-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .agenda-event-location {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    /* Event Dialog Styles */
+    .event-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .event-dialog {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .event-dialog-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .event-dialog-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .event-field {
+        margin-bottom: 1rem;
+    }
+
+    .event-field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .event-field label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+    }
+
+    .event-field input[type="datetime-local"],
+    .event-field select,
+    .event-field textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.875rem;
+    }
+
+    .event-field textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .event-field-check {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .event-field-check label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .event-field-check input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .event-dialog-footer {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Event Detail Styles */
+    .event-detail {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-detail-header {
+        padding: 1.5rem;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+    }
+
+    .event-detail-header h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+    }
+
+    .event-detail-header p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .event-detail-body {
+        padding: 1.5rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .event-detail-section {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        align-items: start;
+    }
+
+    .event-detail-section strong {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .event-detail-section p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .event-detail-section a {
+        color: #3b82f6;
+        text-decoration: none;
+    }
+
+    .event-detail-section a:hover {
+        text-decoration: underline;
+    }
+
+    .event-detail-footer {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        color: #64748b;
+    }
+
+    .empty-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        color: #94a3b8;
+        font-size: 1.125rem;
+    }
+</style>
