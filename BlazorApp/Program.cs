@@ -20,6 +20,9 @@ builder.Services.AddScoped<BrowserExtensions>();
 // builder.Services.AddHttpClient<IJsonPlaceholderService, JsonPlaceholderService>();
 builder.Services.AddScoped<IJsonPlaceholderService, MockJsonPlaceholderService>();
 
+// Add Mail service
+builder.Services.AddScoped<IMailService, MockMailService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
