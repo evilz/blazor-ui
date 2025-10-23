@@ -1,0 +1,102 @@
+@page "/404"
+
+<PageTitle>Page Not Found - Blazor UI</PageTitle>
+
+<div class="not-found-container">
+    <div class="not-found-content">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-description">
+            Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
+        </p>
+        <div class="error-actions">
+            <Button Type="ButtonType.Primary" OnClick="GoHome">
+                <Icon Name="home" Size="20px" />
+                Back to Home
+            </Button>
+        </div>
+        <div class="error-illustration">
+            <Icon Name="explore_off" Size="120px" Style="opacity: 0.3;" />
+        </div>
+    </div>
+</div>
+
+<style>
+    .not-found-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        padding: 2rem;
+    }
+
+    .not-found-content {
+        text-align: center;
+        max-width: 600px;
+        position: relative;
+    }
+
+    .error-code {
+        font-size: 8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin-bottom: 1rem;
+    }
+
+    .error-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+
+    .error-description {
+        font-size: 1.125rem;
+        color: #64748b;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 3rem;
+    }
+
+    .error-illustration {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: -1;
+    }
+
+    @@media (max-width: 768px) {
+        .error-code {
+            font-size: 5rem;
+        }
+
+        .error-title {
+            font-size: 2rem;
+        }
+
+        .error-description {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+@code {
+    [Inject]
+    private NavigationManager? Navigation { get; set; }
+
+    private void GoHome()
+    {
+        Navigation?.NavigateTo("/");
+    }
+}
