@@ -1,0 +1,650 @@
+@page "/mail"
+@rendermode InteractiveServer
+@inject IMailService MailService
+@using BlazorApp.Models
+@using BlazorApp.Services
+
+<PageTitle>Mail - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <h1>Mail</h1>
+    <p>Manage your email messages</p>
+</div>
+
+<div class="mail-container">
+    <div class="mail-sidebar">
+        <Button Text="New Email" Icon="edit" OnClick="ShowComposeDialog" Style="width: 100%; margin-bottom: 1rem;" />
+        
+        <div class="mail-folders">
+            <div class="mail-folder @(selectedFolder == "Inbox" ? "active" : "")" @onclick='() => SelectFolder("Inbox")'>
+                <Icon Name="inbox" Size="20px" />
+                <span>Inbox</span>
+                <span class="count">@unreadCount</span>
+            </div>
+            <div class="mail-folder @(selectedFolder == "Sent" ? "active" : "")" @onclick='() => SelectFolder("Sent")'>
+                <Icon Name="send" Size="20px" />
+                <span>Sent</span>
+            </div>
+            <div class="mail-folder @(selectedFolder == "Drafts" ? "active" : "")" @onclick='() => SelectFolder("Drafts")'>
+                <Icon Name="draft" Size="20px" />
+                <span>Drafts</span>
+            </div>
+            <div class="mail-folder @(selectedFolder == "Starred" ? "active" : "")" @onclick='() => SelectFolder("Starred")'>
+                <Icon Name="star" Size="20px" />
+                <span>Starred</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mail-list">
+        <div class="mail-list-header">
+            <h3>@selectedFolder</h3>
+            <div class="mail-actions">
+                <Icon Name="refresh" Size="20px" Tooltip="Refresh" OnClick="LoadEmails" />
+            </div>
+        </div>
+        
+        @if (isLoading)
+        {
+            <div class="loading">Loading emails...</div>
+        }
+        else if (emails.Count == 0)
+        {
+            <div class="empty-state">
+                <Icon Name="mail" Size="48px" />
+                <p>No emails in @selectedFolder</p>
+            </div>
+        }
+        else
+        {
+            <div class="email-list">
+                @foreach (var email in emails)
+                {
+                    <div class="email-item @(email.IsRead ? "read" : "unread") @(selectedEmail?.Id == email.Id ? "selected" : "")" 
+                         @onclick="() => SelectEmail(email)">
+                        <div class="email-item-header">
+                            <div @onclick:stopPropagation="true" @onclick="async () => await ToggleStar(email.Id)" style="cursor: pointer;">
+                                <Icon Name="@(email.IsStarred ? "star" : "star_outline")" 
+                                      Size="18px" 
+                                      Style="@(email.IsStarred ? "color: #f59e0b;" : "")" />
+                            </div>
+                            <span class="email-from">@email.From</span>
+                            <span class="email-date">@FormatDate(email.Date)</span>
+                        </div>
+                        <div class="email-subject">@email.Subject</div>
+                        <div class="email-preview">@email.Preview</div>
+                        @if (email.HasAttachment)
+                        {
+                            <div class="email-attachment">
+                                <Icon Name="attach_file" Size="14px" />
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    @if (selectedEmail != null)
+    {
+        <div class="mail-detail">
+            <div class="mail-detail-header">
+                <div class="mail-detail-actions">
+                    <Icon Name="reply" Size="20px" Tooltip="Reply" OnClick="() => ReplyToEmail()" />
+                    <Icon Name="reply_all" Size="20px" Tooltip="Reply All" OnClick="() => {}" />
+                    <Icon Name="forward" Size="20px" Tooltip="Forward" OnClick="() => {}" />
+                    <Icon Name="delete" Size="20px" Tooltip="Delete" OnClick="async () => await DeleteEmail(selectedEmail.Id)" />
+                </div>
+                <Icon Name="close" Size="20px" Tooltip="Close" OnClick="() => selectedEmail = null" />
+            </div>
+            
+            <div class="mail-detail-content">
+                <h2>@selectedEmail.Subject</h2>
+                <div class="mail-meta">
+                    <div class="mail-sender">
+                        <div class="sender-avatar">@selectedEmail.From[0]</div>
+                        <div class="sender-info">
+                            <div class="sender-name">@selectedEmail.From</div>
+                            <div class="sender-email">@selectedEmail.FromEmail</div>
+                        </div>
+                    </div>
+                    <div class="mail-date-full">@selectedEmail.Date.ToString("dddd, MMMM d, yyyy h:mm tt")</div>
+                </div>
+                <div class="mail-body">
+                    @((MarkupString)selectedEmail.Body.Replace("\n", "<br />"))
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="mail-detail empty">
+            <div class="empty-state">
+                <Icon Name="mail_outline" Size="64px" />
+                <p>Select an email to read</p>
+            </div>
+        </div>
+    }
+</div>
+
+@if (showCompose)
+{
+    <div class="compose-overlay" @onclick="CloseCompose">
+        <div class="compose-dialog" @onclick:stopPropagation="true">
+            <div class="compose-header">
+                <h3>@(isReply ? "Reply" : "New Email")</h3>
+                <Icon Name="close" Size="20px" OnClick="CloseCompose" />
+            </div>
+            <div class="compose-body">
+                <div class="compose-field">
+                    <label>To:</label>
+                    <Input @bind-Value="composeTo" Placeholder="recipient@example.com" />
+                </div>
+                <div class="compose-field">
+                    <label>Subject:</label>
+                    <Input @bind-Value="composeSubject" Placeholder="Subject" />
+                </div>
+                <div class="compose-field">
+                    <label>Message:</label>
+                    <textarea @bind="composeBody" rows="10" placeholder="Type your message here..."></textarea>
+                </div>
+            </div>
+            <div class="compose-footer">
+                <Button Text="Send" Icon="send" OnClick="SendEmail" />
+                <Button Text="Cancel" Type="ButtonType.Secondary" OnClick="CloseCompose" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Email> emails = new();
+    private Email? selectedEmail = null;
+    private string selectedFolder = "Inbox";
+    private bool isLoading = false;
+    private int unreadCount = 0;
+    
+    private bool showCompose = false;
+    private bool isReply = false;
+    private string composeTo = "";
+    private string composeSubject = "";
+    private string composeBody = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEmails();
+    }
+
+    private async Task LoadEmails()
+    {
+        isLoading = true;
+        StateHasChanged();
+        
+        emails = await MailService.GetEmailsAsync(selectedFolder);
+        unreadCount = emails.Count(e => !e.IsRead);
+        
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task SelectFolder(string folder)
+    {
+        selectedFolder = folder;
+        selectedEmail = null;
+        await LoadEmails();
+    }
+
+    private async Task SelectEmail(Email email)
+    {
+        selectedEmail = email;
+        if (!email.IsRead)
+        {
+            await MailService.MarkAsReadAsync(email.Id);
+            email.IsRead = true;
+            unreadCount = Math.Max(0, unreadCount - 1);
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleStar(int emailId)
+    {
+        await MailService.ToggleStarAsync(emailId);
+        var email = emails.FirstOrDefault(e => e.Id == emailId);
+        if (email != null)
+        {
+            email.IsStarred = !email.IsStarred;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DeleteEmail(int emailId)
+    {
+        await MailService.DeleteEmailAsync(emailId);
+        emails.RemoveAll(e => e.Id == emailId);
+        if (selectedEmail?.Id == emailId)
+        {
+            selectedEmail = null;
+        }
+        StateHasChanged();
+    }
+
+    private void ShowComposeDialog()
+    {
+        isReply = false;
+        composeTo = "";
+        composeSubject = "";
+        composeBody = "";
+        showCompose = true;
+    }
+
+    private void ReplyToEmail()
+    {
+        if (selectedEmail == null) return;
+        
+        isReply = true;
+        composeTo = selectedEmail.FromEmail;
+        composeSubject = "Re: " + selectedEmail.Subject;
+        composeBody = $"\n\n---\nOn {selectedEmail.Date:g}, {selectedEmail.From} wrote:\n{selectedEmail.Body}";
+        showCompose = true;
+    }
+
+    private async Task SendEmail()
+    {
+        var email = new Email
+        {
+            From = "Me",
+            FromEmail = "me@example.com",
+            Subject = composeSubject,
+            Body = composeBody,
+            Preview = composeBody.Length > 100 ? composeBody.Substring(0, 100) + "..." : composeBody,
+            IsRead = true,
+            Category = "Sent"
+        };
+
+        await MailService.SendEmailAsync(email);
+        CloseCompose();
+        
+        // Show success message
+        StateHasChanged();
+    }
+
+    private void CloseCompose()
+    {
+        showCompose = false;
+    }
+
+    private string FormatDate(DateTime date)
+    {
+        var now = DateTime.Now;
+        var diff = now - date;
+
+        if (diff.TotalMinutes < 1)
+            return "Just now";
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes}m ago";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours}h ago";
+        if (diff.TotalDays < 7)
+            return $"{(int)diff.TotalDays}d ago";
+        if (date.Year == now.Year)
+            return date.ToString("MMM d");
+        return date.ToString("MMM d, yyyy");
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .mail-container {
+        display: grid;
+        grid-template-columns: 200px 350px 1fr;
+        gap: 1rem;
+        height: calc(100vh - 200px);
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    .mail-sidebar {
+        padding: 1rem;
+        border-right: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .mail-folders {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .mail-folder {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.625rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .mail-folder:hover {
+        background: #e2e8f0;
+    }
+
+    .mail-folder.active {
+        background: #e0e7ff;
+        color: #4f46e5;
+        font-weight: 500;
+    }
+
+    .mail-folder .count {
+        margin-left: auto;
+        background: #4f46e5;
+        color: white;
+        padding: 0.125rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .mail-list {
+        border-right: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .mail-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .mail-list-header h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .mail-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .email-list {
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .email-item {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: background 0.2s;
+        position: relative;
+    }
+
+    .email-item:hover {
+        background: #f8fafc;
+    }
+
+    .email-item.selected {
+        background: #eff6ff;
+        border-left: 3px solid #3b82f6;
+    }
+
+    .email-item.unread {
+        background: #fefce8;
+    }
+
+    .email-item.unread .email-from,
+    .email-item.unread .email-subject {
+        font-weight: 600;
+    }
+
+    .email-item-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .email-from {
+        flex: 1;
+        font-size: 0.875rem;
+        color: #1e293b;
+    }
+
+    .email-date {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .email-subject {
+        font-size: 0.875rem;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .email-preview {
+        font-size: 0.8125rem;
+        color: #64748b;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .email-attachment {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        color: #64748b;
+    }
+
+    .mail-detail {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .mail-detail.empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mail-detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .mail-detail-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .mail-detail-content {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .mail-detail-content h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 1rem 0;
+        color: #1e293b;
+    }
+
+    .mail-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .mail-sender {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .sender-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .sender-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .sender-email {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .mail-date-full {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .mail-body {
+        line-height: 1.6;
+        color: #334155;
+        white-space: pre-wrap;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        color: #94a3b8;
+        text-align: center;
+    }
+
+    .empty-state p {
+        margin: 1rem 0 0 0;
+        font-size: 1rem;
+    }
+
+    .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        color: #64748b;
+    }
+
+    .compose-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .compose-dialog {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .compose-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .compose-header h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .compose-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .compose-field {
+        margin-bottom: 1rem;
+    }
+
+    .compose-field label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+    }
+
+    .compose-field textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.875rem;
+        resize: vertical;
+    }
+
+    .compose-field textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .compose-footer {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+</style>
