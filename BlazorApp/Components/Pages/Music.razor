@@ -116,6 +116,7 @@
     private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
     private List<Track> playlist = new();
     private Track currentTrack = new();
+    private int currentTrackIndex = 0;
     private bool isPlaying = false;
     private bool isShuffleOn = false;
     private bool isRepeatOn = false;
@@ -216,7 +217,8 @@
             }
         };
 
-        currentTrack = playlist.First();
+        currentTrack = playlist.FirstOrDefault() ?? new Track();
+        currentTrackIndex = 0;
     }
 
     private void TogglePlay()
@@ -226,16 +228,19 @@
 
     private void PlayNext()
     {
-        var currentIndex = playlist.FindIndex(t => t.Id == currentTrack.Id);
-        if (currentIndex < playlist.Count - 1)
+        if (playlist.Count == 0) return;
+
+        if (currentTrackIndex < playlist.Count - 1)
         {
-            currentTrack = playlist[currentIndex + 1];
+            currentTrackIndex++;
+            currentTrack = playlist[currentTrackIndex];
             progressPercentage = 0;
             currentTime = "0:00";
         }
         else if (isRepeatOn)
         {
-            currentTrack = playlist.First();
+            currentTrackIndex = 0;
+            currentTrack = playlist[currentTrackIndex];
             progressPercentage = 0;
             currentTime = "0:00";
         }
@@ -243,16 +248,19 @@
 
     private void PlayPrevious()
     {
-        var currentIndex = playlist.FindIndex(t => t.Id == currentTrack.Id);
-        if (currentIndex > 0)
+        if (playlist.Count == 0) return;
+
+        if (currentTrackIndex > 0)
         {
-            currentTrack = playlist[currentIndex - 1];
+            currentTrackIndex--;
+            currentTrack = playlist[currentTrackIndex];
             progressPercentage = 0;
             currentTime = "0:00";
         }
         else if (isRepeatOn)
         {
-            currentTrack = playlist.Last();
+            currentTrackIndex = playlist.Count - 1;
+            currentTrack = playlist[currentTrackIndex];
             progressPercentage = 0;
             currentTime = "0:00";
         }
@@ -260,10 +268,16 @@
 
     private void SelectTrack(Track track)
     {
-        currentTrack = track;
-        isPlaying = true;
-        progressPercentage = 0;
-        currentTime = "0:00";
+        if (playlist.Count == 0) return;
+
+        currentTrackIndex = playlist.FindIndex(t => t.Id == track.Id);
+        if (currentTrackIndex >= 0)
+        {
+            currentTrack = track;
+            isPlaying = true;
+            progressPercentage = 0;
+            currentTime = "0:00";
+        }
     }
 
     private void ToggleShuffle()
