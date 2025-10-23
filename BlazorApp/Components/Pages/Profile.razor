@@ -1,0 +1,496 @@
+@page "/profile"
+@rendermode InteractiveServer
+
+<PageTitle>Profile - Blazor UI</PageTitle>
+
+<div class="profile-page">
+    <!-- Cover Image -->
+    <div class="cover-image">
+        <div class="cover-gradient"></div>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="avatar-section">
+                <Avatar Name="@userName" ImageUrl="" />
+            </div>
+            <div class="profile-info">
+                <div class="profile-name-section">
+                    <h1>@userName</h1>
+                    <Badge Text="Pro" Type="BadgeType.Default" />
+                </div>
+                <p class="profile-bio">@userBio</p>
+                <div class="profile-meta">
+                    <div class="meta-item">
+                        <Icon Name="location_on" Size="18px" />
+                        <span>@location</span>
+                    </div>
+                    <div class="meta-item">
+                        <Icon Name="link" Size="18px" />
+                        <span>@website</span>
+                    </div>
+                    <div class="meta-item">
+                        <Icon Name="calendar_today" Size="18px" />
+                        <span>Joined @joinDate</span>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <Button Text="Edit Profile" Type="ButtonType.Primary" />
+                <Button Icon="share" Type="ButtonType.Secondary" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <Card Style="min-width: 150px;">
+            <CardContent>
+                <div class="stat-card">
+                    <p class="stat-value">@posts</p>
+                    <p class="stat-label">Posts</p>
+                </div>
+            </CardContent>
+        </Card>
+        <Card Style="min-width: 150px;">
+            <CardContent>
+                <div class="stat-card">
+                    <p class="stat-value">@followers</p>
+                    <p class="stat-label">Followers</p>
+                </div>
+            </CardContent>
+        </Card>
+        <Card Style="min-width: 150px;">
+            <CardContent>
+                <div class="stat-card">
+                    <p class="stat-value">@following</p>
+                    <p class="stat-label">Following</p>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="tabs-section">
+        <div class="tabs-header">
+            <button class="tab-button @(activeTab == "posts" ? "active" : "")" @onclick="@(() => activeTab = "posts")">
+                <Icon Name="article" Size="20px" />
+                Posts
+            </button>
+            <button class="tab-button @(activeTab == "photos" ? "active" : "")" @onclick="@(() => activeTab = "photos")">
+                <Icon Name="photo" Size="20px" />
+                Photos
+            </button>
+            <button class="tab-button @(activeTab == "about" ? "active" : "")" @onclick="@(() => activeTab = "about")">
+                <Icon Name="info" Size="20px" />
+                About
+            </button>
+        </div>
+
+        <div class="tabs-content">
+            @if (activeTab == "posts")
+            {
+                <div class="posts-grid">
+                    @foreach (var post in userPosts)
+                    {
+                        <Card>
+                            <CardHeader>
+                                <div class="post-header">
+                                    <Avatar Name="@userName" ImageUrl="" />
+                                    <div class="post-meta">
+                                        <h4>@userName</h4>
+                                        <span class="post-date">@post.Date</span>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <p>@post.Content</p>
+                            </CardContent>
+                            <CardFooter>
+                                <div class="post-actions">
+                                    <Button Icon="favorite" Text="@post.Likes" Type="ButtonType.Secondary" Size="ButtonSize.Small" />
+                                    <Button Icon="comment" Text="@post.Comments" Type="ButtonType.Secondary" Size="ButtonSize.Small" />
+                                    <Button Icon="share" Type="ButtonType.Secondary" Size="ButtonSize.Small" />
+                                </div>
+                            </CardFooter>
+                        </Card>
+                    }
+                </div>
+            }
+            else if (activeTab == "photos")
+            {
+                <div class="photos-grid">
+                    @foreach (var photo in userPhotos)
+                    {
+                        <Card>
+                            <CardContent>
+                                <div class="photo-placeholder">
+                                    <Icon Name="@photo.Icon" Size="48px" />
+                                </div>
+                                <p style="margin-top: 0.5rem; text-align: center;">@photo.Title</p>
+                            </CardContent>
+                        </Card>
+                    }
+                </div>
+            }
+            else if (activeTab == "about")
+            {
+                <Card>
+                    <CardHeader>
+                        <h3>About</h3>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="about-section">
+                            <div class="about-item">
+                                <Icon Name="work" Size="20px" />
+                                <div>
+                                    <p class="about-label">Work</p>
+                                    <p class="about-value">@work</p>
+                                </div>
+                            </div>
+                            <div class="about-item">
+                                <Icon Name="school" Size="20px" />
+                                <div>
+                                    <p class="about-label">Education</p>
+                                    <p class="about-value">@education</p>
+                                </div>
+                            </div>
+                            <div class="about-item">
+                                <Icon Name="location_city" Size="20px" />
+                                <div>
+                                    <p class="about-label">Lives in</p>
+                                    <p class="about-value">@location</p>
+                                </div>
+                            </div>
+                            <div class="about-item">
+                                <Icon Name="cake" Size="20px" />
+                                <div>
+                                    <p class="about-label">Joined</p>
+                                    <p class="about-value">@joinDate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card Style="margin-top: 1.5rem;">
+                    <CardHeader>
+                        <h3>Skills</h3>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="skills-section">
+                            @foreach (var skill in skills)
+                            {
+                                <Badge Text="@skill" Type="BadgeType.Outline" />
+                            }
+                        </div>
+                    </CardContent>
+                </Card>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string userName = "John Doe";
+    private string userBio = "Full-stack developer passionate about creating amazing web experiences. Love working with Blazor and modern web technologies.";
+    private string location = "San Francisco, CA";
+    private string website = "johndoe.dev";
+    private string joinDate = "January 2024";
+    private string work = "Senior Developer at Tech Corp";
+    private string education = "Computer Science, MIT";
+    
+    private int posts = 142;
+    private string followers = "2.5k";
+    private string following = "384";
+    
+    private string activeTab = "posts";
+    
+    private List<string> skills = new() { "C#", "Blazor", ".NET", "JavaScript", "TypeScript", "React", "SQL", "Azure", "Git" };
+    
+    private List<Post> userPosts = new()
+    {
+        new Post 
+        { 
+            Content = "Just finished working on an amazing Blazor project! The component model is so intuitive and powerful. 🚀", 
+            Date = "2 hours ago", 
+            Likes = "24", 
+            Comments = "5" 
+        },
+        new Post 
+        { 
+            Content = "Excited to share my latest blog post about building modern web applications with .NET 9 and Blazor.", 
+            Date = "1 day ago", 
+            Likes = "56", 
+            Comments = "12" 
+        },
+        new Post 
+        { 
+            Content = "Working on a new UI component library. Stay tuned for updates! 🎨", 
+            Date = "3 days ago", 
+            Likes = "42", 
+            Comments = "8" 
+        }
+    };
+    
+    private List<Photo> userPhotos = new()
+    {
+        new Photo { Title = "Sunset View", Icon = "landscape" },
+        new Photo { Title = "City Lights", Icon = "location_city" },
+        new Photo { Title = "Mountain Peak", Icon = "terrain" },
+        new Photo { Title = "Ocean Wave", Icon = "water" },
+        new Photo { Title = "Forest Path", Icon = "park" },
+        new Photo { Title = "Desert Dunes", Icon = "brightness_5" }
+    };
+    
+    public class Post
+    {
+        public string Content { get; set; } = "";
+        public string Date { get; set; } = "";
+        public string Likes { get; set; } = "";
+        public string Comments { get; set; } = "";
+    }
+    
+    public class Photo
+    {
+        public string Title { get; set; } = "";
+        public string Icon { get; set; } = "";
+    }
+}
+
+<style>
+    .profile-page {
+        margin: -0.25rem -1rem 0;
+    }
+
+    .cover-image {
+        height: 200px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cover-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.2) 100%);
+    }
+
+    .profile-header {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-header-content {
+        padding: 0 1.5rem 1.5rem;
+        position: relative;
+    }
+
+    .avatar-section {
+        margin-top: -3rem;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+        border: 4px solid white;
+        border-radius: 50%;
+        background: white;
+    }
+
+    .profile-info {
+        margin-bottom: 1rem;
+    }
+
+    .profile-name-section {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-name-section h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .profile-bio {
+        color: #64748b;
+        margin: 0 0 1rem 0;
+        line-height: 1.6;
+    }
+
+    .profile-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .profile-actions {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 0 1rem 2rem;
+    }
+
+    .stat-card {
+        text-align: center;
+        padding: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .tabs-section {
+        margin: 0 1rem;
+    }
+
+    .tabs-header {
+        display: flex;
+        gap: 0.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+
+    .tab-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: #64748b;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .tab-button:hover {
+        color: #1e293b;
+        background: #f8fafc;
+    }
+
+    .tab-button.active {
+        color: #6366f1;
+        border-bottom-color: #6366f1;
+    }
+
+    .posts-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .post-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .post-meta h4 {
+        margin: 0;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .post-date {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .post-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .photo-placeholder {
+        aspect-ratio: 1;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+    }
+
+    .about-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .about-item {
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .about-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .about-value {
+        font-weight: 500;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .skills-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    @@media (max-width: 768px) {
+        .profile-actions {
+            position: static;
+            margin-top: 1rem;
+        }
+
+        .profile-header-content {
+            padding: 0 1rem 1rem;
+        }
+
+        .stats-section,
+        .tabs-section {
+            margin: 0 1rem 2rem;
+        }
+    }
+</style>
