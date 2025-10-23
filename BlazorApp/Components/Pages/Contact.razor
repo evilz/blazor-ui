@@ -1,0 +1,384 @@
+@page "/contact"
+@rendermode InteractiveServer
+
+<PageTitle>Contact - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Contact Us</h1>
+    <p>Get in touch with us. We'd love to hear from you.</p>
+</div>
+
+<div class="contact-container">
+    <!-- Contact Form -->
+    <Card Style="flex: 1; min-width: 300px;">
+        <CardHeader>
+            <div class="header-with-icon">
+                <Icon Name="mail" />
+                <h3>Send us a message</h3>
+            </div>
+            <p class="card-description">Fill out the form below and we'll get back to you as soon as possible.</p>
+        </CardHeader>
+        <CardContent>
+            <div class="form-container">
+                <div class="form-row">
+                    <div class="form-field">
+                        <Input Label="Name" @bind-Value="name" TItem="string" Placeholder="Your name" />
+                    </div>
+                    <div class="form-field">
+                        <Input Label="Email" @bind-Value="email" TItem="string" Type="email" Placeholder="your.email@example.com" />
+                    </div>
+                </div>
+                <div class="form-field">
+                    <Input Label="Subject" @bind-Value="subject" TItem="string" Placeholder="How can we help?" />
+                </div>
+                <div class="form-field">
+                    <label class="input-label">Message</label>
+                    <textarea class="textarea-input" @bind="message" placeholder="Tell us more about your inquiry..." rows="6"></textarea>
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Button Text="Send Message" Icon="send" Style="width: 100%;" OnClick="HandleSubmit" />
+        </CardFooter>
+    </Card>
+
+    <!-- Contact Information -->
+    <div class="contact-info-section">
+        <Card Style="margin-bottom: 1.5rem;">
+            <CardHeader>
+                <div class="header-with-icon">
+                    <Icon Name="business" />
+                    <h3>Contact Information</h3>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="info-list">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <Icon Name="location_on" Size="24px" />
+                        </div>
+                        <div class="info-content">
+                            <p class="info-label">Address</p>
+                            <p class="info-value">123 Business Street<br/>Suite 100<br/>San Francisco, CA 94107</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <Icon Name="phone" Size="24px" />
+                        </div>
+                        <div class="info-content">
+                            <p class="info-label">Phone</p>
+                            <p class="info-value">+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <Icon Name="mail" Size="24px" />
+                        </div>
+                        <div class="info-content">
+                            <p class="info-label">Email</p>
+                            <p class="info-value">hello@blazorui.com</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <Icon Name="schedule" Size="24px" />
+                        </div>
+                        <div class="info-content">
+                            <p class="info-label">Business Hours</p>
+                            <p class="info-value">Monday - Friday<br/>9:00 AM - 6:00 PM PST</p>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <div class="header-with-icon">
+                    <Icon Name="share" />
+                    <h3>Follow Us</h3>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="social-links">
+                    <button class="social-button">
+                        <Icon Name="language" Size="20px" />
+                        <span>Website</span>
+                    </button>
+                    <button class="social-button">
+                        <Icon Name="code" Size="20px" />
+                        <span>GitHub</span>
+                    </button>
+                    <button class="social-button">
+                        <Icon Name="article" Size="20px" />
+                        <span>Blog</span>
+                    </button>
+                    <button class="social-button">
+                        <Icon Name="contact_support" Size="20px" />
+                        <span>Support</span>
+                    </button>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+</div>
+
+@if (showSuccessMessage)
+{
+    <div class="success-toast">
+        <Icon Name="check_circle" Size="20px" />
+        <span>Message sent successfully! We'll get back to you soon.</span>
+    </div>
+}
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+    private string name = "";
+    private string email = "";
+    private string subject = "";
+    private string message = "";
+    private bool showSuccessMessage = false;
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Contact") { Url = "/contact" }
+        };
+    }
+
+    private async Task HandleSubmit()
+    {
+        // Validate form
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        // Show success message
+        showSuccessMessage = true;
+        StateHasChanged();
+
+        // Clear form
+        await Task.Delay(3000);
+        name = "";
+        email = "";
+        subject = "";
+        message = "";
+        showSuccessMessage = false;
+        StateHasChanged();
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .contact-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .card-description {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .textarea-input {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        font-family: inherit;
+        color: #1e293b;
+        resize: vertical;
+        transition: all 0.15s;
+    }
+
+    .textarea-input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .textarea-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .contact-info-section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .info-icon {
+        background: #f1f5f9;
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        color: #475569;
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .info-value {
+        font-weight: 500;
+        color: #1e293b;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .social-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .social-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .social-button:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+
+    .header-with-icon {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .header-with-icon h3 {
+        margin: 0;
+    }
+
+    .success-toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #10b981;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @@media (max-width: 1024px) {
+        .contact-container {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .success-toast {
+            left: 1rem;
+            right: 1rem;
+            bottom: 1rem;
+        }
+
+        .social-links {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
