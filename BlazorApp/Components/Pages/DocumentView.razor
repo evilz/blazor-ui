@@ -1,0 +1,822 @@
+@page "/documents"
+@page "/documents/{DocumentId:int}"
+@rendermode InteractiveServer
+@inject IDocumentService DocumentService
+@inject NavigationManager Navigation
+@using BlazorApp.Models
+@using BlazorApp.Services
+
+<PageTitle>Documents - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <h1>Document View</h1>
+    <p>Review and manage document details</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading-state">
+        <Icon Name="hourglass_empty" Size="48px" />
+        <p>Loading document...</p>
+    </div>
+}
+else if (selectedDocument == null)
+{
+    <div class="document-list-container">
+        <Card>
+            <CardHeader>
+                <h3>Available Documents</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="document-list">
+                    @foreach (var doc in documents)
+                    {
+                        <div class="document-card" @onclick="() => SelectDocument(doc.Id)">
+                            <div class="document-card-icon">
+                                <Icon Name="@GetDocumentIcon(doc.Type)" Size="32px" />
+                            </div>
+                            <div class="document-card-content">
+                                <h4>@doc.Title</h4>
+                                <p class="document-description">@doc.Description</p>
+                                <div class="document-meta">
+                                    <span class="document-status @GetStatusClass(doc.Status)">@doc.Status</span>
+                                    <span class="document-info">v@doc.Version • @doc.Author • @FormatDate(doc.LastModified)</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+}
+else
+{
+    <div class="document-container">
+        <!-- Document Preview/Content Area -->
+        <div class="document-main">
+            <Card Style="height: 100%;">
+                <CardHeader>
+                    <div class="document-header">
+                        <div class="document-title-section">
+                            <Button Icon="arrow_back" Type="ButtonType.Secondary" Size="ButtonSize.Small" 
+                                    OnClick="BackToList" Tooltip="Back to list" />
+                            <div>
+                                <h2>@selectedDocument.Title</h2>
+                                <p class="document-subtitle">@selectedDocument.Description</p>
+                            </div>
+                        </div>
+                        <div class="document-actions">
+                            <Button Icon="download" Type="ButtonType.Secondary" Size="ButtonSize.Small" 
+                                    Tooltip="Download" OnClick="() => {}" />
+                            <Button Icon="share" Type="ButtonType.Secondary" Size="ButtonSize.Small" 
+                                    Tooltip="Share" OnClick="() => {}" />
+                            <Button Icon="more_vert" Type="ButtonType.Secondary" Size="ButtonSize.Small" 
+                                    Tooltip="More options" OnClick="() => {}" />
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="document-content">
+                        <div class="document-preview">
+                            @((MarkupString)selectedDocument.Content.Replace("\n", "<br />"))
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+        <!-- Audit & Review Details Panel -->
+        <div class="document-sidebar">
+            <!-- Document Status -->
+            <Card Style="margin-bottom: 1rem;">
+                <CardHeader>
+                    <h3 class="sidebar-title">Document Status</h3>
+                </CardHeader>
+                <CardContent>
+                    <div class="status-section">
+                        <div class="status-badge-large @GetStatusClass(selectedDocument.Status)">
+                            <Icon Name="@GetStatusIcon(selectedDocument.Status)" Size="24px" />
+                            <span>@selectedDocument.Status</span>
+                        </div>
+                        <div class="status-details">
+                            <div class="status-detail-item">
+                                <span class="label">Type:</span>
+                                <span class="value">@selectedDocument.Type</span>
+                            </div>
+                            <div class="status-detail-item">
+                                <span class="label">Version:</span>
+                                <span class="value">v@selectedDocument.Version</span>
+                            </div>
+                            <div class="status-detail-item">
+                                <span class="label">Size:</span>
+                                <span class="value">@selectedDocument.FileSize</span>
+                            </div>
+                            <div class="status-detail-item">
+                                <span class="label">Created:</span>
+                                <span class="value">@selectedDocument.CreatedDate.ToString("MMM d, yyyy")</span>
+                            </div>
+                            <div class="status-detail-item">
+                                <span class="label">Modified:</span>
+                                <span class="value">@selectedDocument.LastModified.ToString("MMM d, yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Reviewers -->
+            <Card Style="margin-bottom: 1rem;">
+                <CardHeader>
+                    <h3 class="sidebar-title">Reviewers & Approvers</h3>
+                </CardHeader>
+                <CardContent>
+                    <div class="reviewers-list">
+                        @foreach (var reviewer in selectedDocument.Reviewers)
+                        {
+                            <div class="reviewer-item">
+                                <div class="reviewer-avatar">
+                                    @reviewer.Name.Substring(0, 1)
+                                </div>
+                                <div class="reviewer-info">
+                                    <div class="reviewer-name">@reviewer.Name</div>
+                                    <div class="reviewer-role">@reviewer.Role</div>
+                                    @if (reviewer.ReviewedDate.HasValue)
+                                    {
+                                        <div class="reviewer-date">@FormatDate(reviewer.ReviewedDate.Value)</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(reviewer.Comment))
+                                    {
+                                        <div class="reviewer-comment">
+                                            <Icon Name="format_quote" Size="14px" />
+                                            @reviewer.Comment
+                                        </div>
+                                    }
+                                </div>
+                                <div class="reviewer-status @GetReviewerStatusClass(reviewer.Status)">
+                                    <Icon Name="@GetReviewerStatusIcon(reviewer.Status)" Size="18px" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Version History -->
+            <Card Style="margin-bottom: 1rem;">
+                <CardHeader>
+                    <h3 class="sidebar-title">Version History</h3>
+                </CardHeader>
+                <CardContent>
+                    <div class="version-history">
+                        @foreach (var version in selectedDocument.VersionHistory.OrderByDescending(v => v.Version))
+                        {
+                            <div class="version-item @(version.IsCurrent ? "current" : "")">
+                                <div class="version-badge">
+                                    <Icon Name="@(version.IsCurrent ? "check_circle" : "history")" Size="20px" />
+                                </div>
+                                <div class="version-info">
+                                    <div class="version-number">Version @version.Version @(version.IsCurrent ? "(Current)" : "")</div>
+                                    <div class="version-description">@version.Description</div>
+                                    <div class="version-meta">@version.Author • @FormatDate(version.Date)</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Activity Feed -->
+            <Card>
+                <CardHeader>
+                    <h3 class="sidebar-title">Activity Feed</h3>
+                </CardHeader>
+                <CardContent>
+                    <div class="activity-feed">
+                        @foreach (var activity in selectedDocument.Activities.OrderByDescending(a => a.Timestamp).Take(10))
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <Icon Name="@activity.Icon" Size="18px" />
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-text">
+                                        <strong>@activity.User</strong> @activity.Action
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(activity.Details))
+                                    {
+                                        <div class="activity-details">@activity.Details</div>
+                                    }
+                                    <div class="activity-time">@FormatActivityTime(activity.Timestamp)</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int? DocumentId { get; set; }
+
+    private List<Document> documents = new();
+    private Document? selectedDocument = null;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        documents = await DocumentService.GetDocumentsAsync();
+        
+        if (DocumentId.HasValue)
+        {
+            selectedDocument = await DocumentService.GetDocumentByIdAsync(DocumentId.Value);
+        }
+        
+        isLoading = false;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (DocumentId.HasValue && selectedDocument?.Id != DocumentId.Value)
+        {
+            isLoading = true;
+            selectedDocument = await DocumentService.GetDocumentByIdAsync(DocumentId.Value);
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void SelectDocument(int id)
+    {
+        Navigation.NavigateTo($"/documents/{id}");
+    }
+
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/documents");
+    }
+
+    private string GetDocumentIcon(string type)
+    {
+        return type switch
+        {
+            "Contract" => "description",
+            "Requirements" => "checklist",
+            "Report" => "assessment",
+            "Policy" => "policy",
+            _ => "insert_drive_file"
+        };
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return status.ToLower().Replace(" ", "-") switch
+        {
+            "draft" => "status-draft",
+            "under-review" => "status-review",
+            "approved" => "status-approved",
+            "rejected" => "status-rejected",
+            "published" => "status-published",
+            _ => "status-default"
+        };
+    }
+
+    private string GetStatusIcon(string status)
+    {
+        return status.ToLower().Replace(" ", "-") switch
+        {
+            "draft" => "edit",
+            "under-review" => "rate_review",
+            "approved" => "check_circle",
+            "rejected" => "cancel",
+            "published" => "public",
+            _ => "description"
+        };
+    }
+
+    private string GetReviewerStatusClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "approved" => "reviewer-approved",
+            "rejected" => "reviewer-rejected",
+            "pending" => "reviewer-pending",
+            _ => ""
+        };
+    }
+
+    private string GetReviewerStatusIcon(string status)
+    {
+        return status.ToLower() switch
+        {
+            "approved" => "check_circle",
+            "rejected" => "cancel",
+            "pending" => "schedule",
+            _ => "help"
+        };
+    }
+
+    private string FormatDate(DateTime date)
+    {
+        var now = DateTime.Now;
+        var diff = now - date;
+
+        if (diff.TotalMinutes < 1)
+            return "Just now";
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes}m ago";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours}h ago";
+        if (diff.TotalDays < 7)
+            return $"{(int)diff.TotalDays}d ago";
+        if (date.Year == now.Year)
+            return date.ToString("MMM d");
+        return date.ToString("MMM d, yyyy");
+    }
+
+    private string FormatActivityTime(DateTime timestamp)
+    {
+        var now = DateTime.Now;
+        var diff = now - timestamp;
+
+        if (diff.TotalMinutes < 1)
+            return "Just now";
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes} minutes ago";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours} hours ago";
+        if (diff.TotalDays < 7)
+            return $"{(int)diff.TotalDays} days ago";
+        if (diff.TotalDays < 30)
+            return $"{(int)(diff.TotalDays / 7)} weeks ago";
+        return timestamp.ToString("MMM d, yyyy");
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem;
+        color: #64748b;
+    }
+
+    .loading-state p {
+        margin-top: 1rem;
+        font-size: 1rem;
+    }
+
+    /* Document List */
+    .document-list-container {
+        max-width: 1200px;
+    }
+
+    .document-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .document-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+    }
+
+    .document-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .document-card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    .document-card-content {
+        flex: 1;
+    }
+
+    .document-card h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .document-description {
+        margin: 0 0 0.75rem 0;
+        color: #64748b;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .document-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .document-info {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    /* Document View Layout */
+    .document-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 1.5rem;
+        height: calc(100vh - 200px);
+    }
+
+    .document-main {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .document-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        width: 100%;
+        gap: 1rem;
+    }
+
+    .document-title-section {
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+        flex: 1;
+    }
+
+    .document-title-section h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .document-subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .document-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .document-content {
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .document-preview {
+        padding: 1.5rem;
+        line-height: 1.8;
+        color: #334155;
+        white-space: pre-wrap;
+        font-size: 0.9375rem;
+    }
+
+    /* Sidebar */
+    .document-sidebar {
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+
+    .sidebar-title {
+        margin: 0;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: #1e293b;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    /* Status Section */
+    .status-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .status-badge-large {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .status-draft {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .status-review {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-published {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.625rem;
+    }
+
+    .status-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.875rem;
+    }
+
+    .status-detail-item .label {
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .status-detail-item .value {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    /* Reviewers */
+    .reviewers-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .reviewer-item {
+        display: flex;
+        gap: 0.75rem;
+        align-items: start;
+    }
+
+    .reviewer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .reviewer-info {
+        flex: 1;
+    }
+
+    .reviewer-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.875rem;
+    }
+
+    .reviewer-role {
+        color: #64748b;
+        font-size: 0.8125rem;
+        margin-top: 0.125rem;
+    }
+
+    .reviewer-date {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    .reviewer-comment {
+        margin-top: 0.5rem;
+        padding: 0.625rem;
+        background: #f8fafc;
+        border-left: 3px solid #cbd5e1;
+        border-radius: 4px;
+        font-size: 0.8125rem;
+        color: #475569;
+        display: flex;
+        gap: 0.5rem;
+        align-items: start;
+    }
+
+    .reviewer-status {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .reviewer-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .reviewer-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .reviewer-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* Version History */
+    .version-history {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .version-item {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .version-item:hover {
+        background: #f8fafc;
+    }
+
+    .version-item.current {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+    }
+
+    .version-badge {
+        color: #64748b;
+        flex-shrink: 0;
+    }
+
+    .version-item.current .version-badge {
+        color: #2563eb;
+    }
+
+    .version-info {
+        flex: 1;
+    }
+
+    .version-number {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.875rem;
+    }
+
+    .version-item.current .version-number {
+        color: #2563eb;
+    }
+
+    .version-description {
+        color: #64748b;
+        font-size: 0.8125rem;
+        margin-top: 0.25rem;
+    }
+
+    .version-meta {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        margin-top: 0.375rem;
+    }
+
+    /* Activity Feed */
+    .activity-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .activity-item {
+        display: flex;
+        gap: 0.75rem;
+        align-items: start;
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-text {
+        font-size: 0.875rem;
+        color: #334155;
+        line-height: 1.5;
+    }
+
+    .activity-text strong {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .activity-details {
+        margin-top: 0.375rem;
+        padding: 0.5rem;
+        background: #f8fafc;
+        border-radius: 4px;
+        font-size: 0.8125rem;
+        color: #64748b;
+    }
+
+    .activity-time {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+    }
+
+    /* Responsive */
+    @@media (max-width: 1200px) {
+        .document-container {
+            grid-template-columns: 1fr;
+            height: auto;
+        }
+
+        .document-sidebar {
+            order: -1;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .document-header {
+            flex-direction: column;
+        }
+
+        .document-title-section {
+            flex-direction: column;
+        }
+    }
+</style>
