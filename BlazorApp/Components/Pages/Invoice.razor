@@ -1,0 +1,573 @@
+@page "/invoice"
+@rendermode InteractiveServer
+
+<PageTitle>Create Invoice - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Create Invoice</h1>
+    <p>Generate professional invoices for your clients</p>
+</div>
+
+<div class="invoice-container">
+    <!-- Left Column: Invoice Form -->
+    <div class="invoice-form">
+        <!-- Company Information -->
+        <Card Style="margin-bottom: 1.5rem;">
+            <CardHeader>
+                <h3>Your Company</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Company Name</label>
+                        <Input @bind-Value="companyName" Placeholder="Acme Corporation" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Email</label>
+                        <Input @bind-Value="companyEmail" Placeholder="billing@acme.com" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Address</label>
+                        <Input @bind-Value="companyAddress" Placeholder="123 Business St" />
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <Input @bind-Value="companyCity" Placeholder="New York" />
+                    </div>
+                    <div class="form-group">
+                        <label>ZIP Code</label>
+                        <Input @bind-Value="companyZip" Placeholder="10001" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <!-- Client Information -->
+        <Card Style="margin-bottom: 1.5rem;">
+            <CardHeader>
+                <h3>Bill To</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Client Name</label>
+                        <Input @bind-Value="clientName" Placeholder="John Doe" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Email</label>
+                        <Input @bind-Value="clientEmail" Placeholder="john@client.com" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Address</label>
+                        <Input @bind-Value="clientAddress" Placeholder="456 Client Ave" />
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <Input @bind-Value="clientCity" Placeholder="Los Angeles" />
+                    </div>
+                    <div class="form-group">
+                        <label>ZIP Code</label>
+                        <Input @bind-Value="clientZip" Placeholder="90001" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <!-- Invoice Details -->
+        <Card Style="margin-bottom: 1.5rem;">
+            <CardHeader>
+                <h3>Invoice Details</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Invoice Number</label>
+                        <Input @bind-Value="invoiceNumber" Placeholder="INV-001" />
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <Input @bind-Value="invoiceDate" Type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <Input @bind-Value="dueDate" Type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Terms</label>
+                        <Input @bind-Value="paymentTerms" Placeholder="Net 30" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <!-- Line Items -->
+        <Card>
+            <CardHeader>
+                <div class="items-header">
+                    <h3>Invoice Items</h3>
+                    <Button Text="Add Item" Icon="add" OnClick="AddLineItem" />
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="line-items">
+                    @foreach (var item in lineItems)
+                    {
+                        <div class="line-item">
+                            <div class="line-item-fields">
+                                <div class="form-group flex-2">
+                                    <label>Description</label>
+                                    <Input @bind-Value="item.Description" Placeholder="Service or product description" />
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label>Quantity</label>
+                                    <Input @bind-Value="item.Quantity" Type="number" Placeholder="1" />
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label>Rate ($)</label>
+                                    <Input @bind-Value="item.Rate" Type="number" Placeholder="0.00" />
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label>Amount</label>
+                                    <Input Value="@item.Amount.ToString("0.00")" Disabled="true" />
+                                </div>
+                            </div>
+                            <div class="line-item-actions">
+                                <Icon Name="delete" Size="20px" Tooltip="Remove" OnClick="() => RemoveLineItem(item)" Style="cursor: pointer; color: #ef4444;" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+
+    <!-- Right Column: Invoice Preview -->
+    <div class="invoice-preview">
+        <Card Style="position: sticky; top: 1rem;">
+            <CardHeader>
+                <h3>Invoice Preview</h3>
+            </CardHeader>
+            <CardContent>
+                <div class="preview-document">
+                    <!-- Preview Header -->
+                    <div class="preview-header">
+                        <div class="preview-company">
+                            <h2>@(string.IsNullOrWhiteSpace(companyName) ? "Your Company" : companyName)</h2>
+                            <p>@(string.IsNullOrWhiteSpace(companyAddress) ? "Company Address" : companyAddress)</p>
+                            <p>@(string.IsNullOrWhiteSpace(companyCity) ? "City, ZIP" : $"{companyCity}, {companyZip}")</p>
+                            <p>@(string.IsNullOrWhiteSpace(companyEmail) ? "email@company.com" : companyEmail)</p>
+                        </div>
+                        <div class="preview-invoice-info">
+                            <h1 class="invoice-title">INVOICE</h1>
+                            <p><strong>Invoice #:</strong> @(string.IsNullOrWhiteSpace(invoiceNumber) ? "INV-001" : invoiceNumber)</p>
+                            <p><strong>Date:</strong> @(string.IsNullOrWhiteSpace(invoiceDate) ? DateTime.Now.ToString("MM/dd/yyyy") : invoiceDate)</p>
+                            <p><strong>Due Date:</strong> @(string.IsNullOrWhiteSpace(dueDate) ? DateTime.Now.AddDays(30).ToString("MM/dd/yyyy") : dueDate)</p>
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    <!-- Preview Bill To -->
+                    <div class="preview-section">
+                        <h4>Bill To:</h4>
+                        <p class="preview-client-name">@(string.IsNullOrWhiteSpace(clientName) ? "Client Name" : clientName)</p>
+                        <p>@(string.IsNullOrWhiteSpace(clientAddress) ? "Client Address" : clientAddress)</p>
+                        <p>@(string.IsNullOrWhiteSpace(clientCity) ? "City, ZIP" : $"{clientCity}, {clientZip}")</p>
+                        <p>@(string.IsNullOrWhiteSpace(clientEmail) ? "client@email.com" : clientEmail)</p>
+                    </div>
+
+                    <Separator />
+
+                    <!-- Preview Items Table -->
+                    <div class="preview-table">
+                        <div class="preview-table-header">
+                            <div class="preview-table-col col-description">Description</div>
+                            <div class="preview-table-col col-qty">Qty</div>
+                            <div class="preview-table-col col-rate">Rate</div>
+                            <div class="preview-table-col col-amount">Amount</div>
+                        </div>
+                        @if (lineItems.Any())
+                        {
+                            @foreach (var item in lineItems)
+                            {
+                                <div class="preview-table-row">
+                                    <div class="preview-table-col col-description">@(string.IsNullOrWhiteSpace(item.Description) ? "Item description" : item.Description)</div>
+                                    <div class="preview-table-col col-qty">@item.Quantity</div>
+                                    <div class="preview-table-col col-rate">$@item.Rate.ToString("0.00")</div>
+                                    <div class="preview-table-col col-amount">$@item.Amount.ToString("0.00")</div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="preview-table-empty">
+                                <p>No items added yet</p>
+                            </div>
+                        }
+                    </div>
+
+                    <Separator />
+
+                    <!-- Preview Totals -->
+                    <div class="preview-totals">
+                        <div class="preview-total-row">
+                            <span>Subtotal:</span>
+                            <span>$@subtotal.ToString("0.00")</span>
+                        </div>
+                        <div class="preview-total-row">
+                            <span>Tax (@(taxRate * 100)%):</span>
+                            <span>$@tax.ToString("0.00")</span>
+                        </div>
+                        <div class="preview-total-row preview-grand-total">
+                            <span>Total:</span>
+                            <span>$@total.ToString("0.00")</span>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(paymentTerms))
+                    {
+                        <div class="preview-section">
+                            <p><strong>Payment Terms:</strong> @paymentTerms</p>
+                        </div>
+                    }
+                </div>
+            </CardContent>
+            <CardFooter>
+                <div class="preview-actions">
+                    <Button Text="Download PDF" Icon="download" Style="flex: 1;" OnClick="DownloadPdf" />
+                    <Button Text="Send Invoice" Icon="send" Style="flex: 1;" OnClick="SendInvoice" />
+                </div>
+            </CardFooter>
+        </Card>
+    </div>
+</div>
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+
+    // Company Information
+    private string companyName = "Acme Corporation";
+    private string companyEmail = "billing@acme.com";
+    private string companyAddress = "123 Business Street";
+    private string companyCity = "New York";
+    private string companyZip = "10001";
+
+    // Client Information
+    private string clientName = "John Doe";
+    private string clientEmail = "john@client.com";
+    private string clientAddress = "456 Client Avenue";
+    private string clientCity = "Los Angeles";
+    private string clientZip = "90001";
+
+    // Invoice Details
+    private string invoiceNumber = "INV-001";
+    private string invoiceDate = DateTime.Now.ToString("yyyy-MM-dd");
+    private string dueDate = DateTime.Now.AddDays(30).ToString("yyyy-MM-dd");
+    private string paymentTerms = "Net 30";
+
+    // Line Items
+    private List<LineItem> lineItems = new();
+
+    // Calculations
+    private decimal subtotal => lineItems.Sum(x => x.Amount);
+    private decimal taxRate = 0.08m;
+    private decimal tax => subtotal * taxRate;
+    private decimal total => subtotal + tax;
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Invoice") { Url = "/invoice" }
+        };
+
+        // Add initial line items
+        lineItems.Add(new LineItem { Description = "Web Design Services", Quantity = 10, Rate = 150.00m });
+        lineItems.Add(new LineItem { Description = "Development Work", Quantity = 20, Rate = 120.00m });
+        lineItems.Add(new LineItem { Description = "Consulting", Quantity = 5, Rate = 200.00m });
+    }
+
+    private void AddLineItem()
+    {
+        lineItems.Add(new LineItem { Description = "", Quantity = 1, Rate = 0.00m });
+    }
+
+    private void RemoveLineItem(LineItem item)
+    {
+        lineItems.Remove(item);
+    }
+
+    private void DownloadPdf()
+    {
+        Console.WriteLine("Downloading PDF...");
+    }
+
+    private void SendInvoice()
+    {
+        Console.WriteLine("Sending invoice...");
+    }
+
+    private class LineItem
+    {
+        public string Description { get; set; } = "";
+        public int Quantity { get; set; } = 1;
+        public decimal Rate { get; set; } = 0.00m;
+        public decimal Amount => Quantity * Rate;
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .invoice-container {
+        display: grid;
+        grid-template-columns: 1fr 500px;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    @@media (max-width: 1200px) {
+        .invoice-container {
+            grid-template-columns: 1fr;
+        }
+
+        .invoice-preview {
+            order: 1;
+        }
+
+        .invoice-form {
+            order: 2;
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group.flex-1 {
+        flex: 1;
+    }
+
+    .form-group.flex-2 {
+        flex: 2;
+    }
+
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .items-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .line-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .line-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+
+    .line-item-fields {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .line-item-actions {
+        display: flex;
+        align-items: center;
+        padding-bottom: 0.5rem;
+    }
+
+    /* Invoice Preview Styles */
+    .preview-document {
+        background: white;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .preview-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .preview-company h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .preview-company p {
+        margin: 0.25rem 0;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .preview-invoice-info {
+        text-align: right;
+    }
+
+    .invoice-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #6366f1;
+        margin: 0 0 1rem 0;
+    }
+
+    .preview-invoice-info p {
+        margin: 0.25rem 0;
+        color: #475569;
+        font-size: 0.8rem;
+    }
+
+    .preview-section {
+        margin: 1.5rem 0;
+    }
+
+    .preview-section h4 {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .preview-section p {
+        margin: 0.25rem 0;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .preview-client-name {
+        font-weight: 600;
+        color: #1e293b !important;
+    }
+
+    .preview-table {
+        margin: 1.5rem 0;
+    }
+
+    .preview-table-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 2px solid #e2e8f0;
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.8rem;
+    }
+
+    .preview-table-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .preview-table-col {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .col-description {
+        grid-column: 1;
+    }
+
+    .col-qty {
+        text-align: center;
+    }
+
+    .col-rate {
+        text-align: right;
+    }
+
+    .col-amount {
+        text-align: right;
+    }
+
+    .preview-table-empty {
+        padding: 2rem;
+        text-align: center;
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    .preview-totals {
+        margin: 1.5rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-end;
+    }
+
+    .preview-total-row {
+        display: grid;
+        grid-template-columns: 120px 100px;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #475569;
+    }
+
+    .preview-total-row span:last-child {
+        text-align: right;
+    }
+
+    .preview-grand-total {
+        padding-top: 0.5rem;
+        border-top: 2px solid #e2e8f0;
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .preview-actions {
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+    }
+</style>

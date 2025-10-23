@@ -1,0 +1,648 @@
+@page "/travel-guides"
+@rendermode InteractiveServer
+@using BlazorApp.Models
+
+<PageTitle>Travel Guides - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <Breadcrumb Items="@breadcrumbItems" />
+    <h1>Travel Guides</h1>
+    <p>Discover amazing destinations and plan your next adventure</p>
+</div>
+
+<div class="stats-grid">
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <div class="stat-icon-header">
+                <div class="stat-icon">🌍</div>
+                <p>Total Destinations</p>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <p class="stat-value">127</p>
+            <p class="stat-change positive">+12 this month</p>
+        </CardContent>
+    </Card>
+
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <div class="stat-icon-header">
+                <div class="stat-icon">📚</div>
+                <p>Travel Guides</p>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <p class="stat-value">89</p>
+            <p class="stat-change positive">+8 new guides</p>
+        </CardContent>
+    </Card>
+
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <div class="stat-icon-header">
+                <div class="stat-icon">✈️</div>
+                <p>Happy Travelers</p>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <p class="stat-value">15.2K</p>
+            <p class="stat-change positive">+2.3K this year</p>
+        </CardContent>
+    </Card>
+
+    <Card Style="min-width: 250px;">
+        <CardHeader>
+            <div class="stat-icon-header">
+                <div class="stat-icon">⭐</div>
+                <p>Average Rating</p>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <p class="stat-value">4.8</p>
+            <p class="stat-change positive">Based on 3.5K reviews</p>
+        </CardContent>
+    </Card>
+</div>
+
+<div class="section-header">
+    <h2>Featured Destinations</h2>
+    <div class="filter-buttons">
+        <Button Text="All" Size="ButtonSize.Small" Type="@(selectedFilter == "All" ? ButtonType.Primary : ButtonType.Secondary)" OnClick="@(() => FilterGuides("All"))" />
+        <Button Text="Popular" Size="ButtonSize.Small" Type="@(selectedFilter == "Popular" ? ButtonType.Primary : ButtonType.Secondary)" OnClick="@(() => FilterGuides("Popular"))" />
+        <Button Text="Adventure" Size="ButtonSize.Small" Type="@(selectedFilter == "Adventure" ? ButtonType.Primary : ButtonType.Secondary)" OnClick="@(() => FilterGuides("Adventure"))" />
+        <Button Text="Beach" Size="ButtonSize.Small" Type="@(selectedFilter == "Beach" ? ButtonType.Primary : ButtonType.Secondary)" OnClick="@(() => FilterGuides("Beach"))" />
+    </div>
+</div>
+
+<div class="guides-grid">
+    @foreach (var guide in filteredGuides)
+    {
+        <Card Style="min-width: 300px;">
+            <CardContent>
+                <div class="guide-card">
+                    @if (guide.IsFeatured)
+                    {
+                        <div class="featured-badge">Featured</div>
+                    }
+                    <div class="guide-icon-large">@guide.Icon</div>
+                    <h3>@guide.Name</h3>
+                    <div class="guide-location">
+                        <Icon Name="location_on" Size="18px" />
+                        <span>@guide.Location</span>
+                    </div>
+                    <p class="guide-description">@guide.Description</p>
+                    <div class="guide-meta">
+                        <div class="guide-rating">
+                            <Icon Name="star" Size="18px" Style="color: #facc15;" />
+                            <span>@guide.Rating</span>
+                            <span class="review-count">(@guide.ReviewCount)</span>
+                        </div>
+                        <div class="guide-duration">
+                            <Icon Name="schedule" Size="18px" />
+                            <span>@guide.Duration</span>
+                        </div>
+                    </div>
+                    <div class="guide-price-row">
+                        <div class="guide-price">
+                            <span class="price-label">From</span>
+                            <span class="price-value">$@guide.Price</span>
+                        </div>
+                        <Badge Text="@guide.Category" Type="BadgeType.Outline" />
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button Text="View Details" Icon="arrow_forward" Style="width: 100%;" />
+            </CardFooter>
+        </Card>
+    }
+</div>
+
+<div class="section-header">
+    <h2>Popular Travel Routes</h2>
+</div>
+
+<div class="routes-grid">
+    <Card>
+        <CardContent>
+            <div class="route-card">
+                <div class="route-header">
+                    <div class="route-icon">🗼</div>
+                    <div class="route-info">
+                        <h4>European Explorer</h4>
+                        <p class="route-cities">Paris • Rome • Barcelona • Amsterdam</p>
+                    </div>
+                </div>
+                <div class="route-details">
+                    <div class="route-stat">
+                        <Icon Name="event" Size="20px" />
+                        <span>14 Days</span>
+                    </div>
+                    <div class="route-stat">
+                        <Icon Name="location_city" Size="20px" />
+                        <span>8 Cities</span>
+                    </div>
+                    <div class="route-stat">
+                        <Icon Name="groups" Size="20px" />
+                        <span>Max 12</span>
+                    </div>
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+            <div class="route-footer">
+                <span class="route-price">From $2,499</span>
+                <Button Text="Explore" Size="ButtonSize.Small" />
+            </div>
+        </CardFooter>
+    </Card>
+
+    <Card>
+        <CardContent>
+            <div class="route-card">
+                <div class="route-header">
+                    <div class="route-icon">🏔️</div>
+                    <div class="route-info">
+                        <h4>Asian Adventure</h4>
+                        <p class="route-cities">Tokyo • Bangkok • Bali • Singapore</p>
+                    </div>
+                </div>
+                <div class="route-details">
+                    <div class="route-stat">
+                        <Icon Name="event" Size="20px" />
+                        <span>12 Days</span>
+                    </div>
+                    <div class="route-stat">
+                        <Icon Name="location_city" Size="20px" />
+                        <span>6 Cities</span>
+                    </div>
+                    <div class="route-stat">
+                        <Icon Name="groups" Size="20px" />
+                        <span>Max 10</span>
+                    </div>
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+            <div class="route-footer">
+                <span class="route-price">From $1,999</span>
+                <Button Text="Explore" Size="ButtonSize.Small" />
+            </div>
+        </CardFooter>
+    </Card>
+
+    <Card>
+        <CardContent>
+            <div class="route-card">
+                <div class="route-header">
+                    <div class="route-icon">🌴</div>
+                    <div class="route-info">
+                        <h4>Island Hopping</h4>
+                        <p class="route-cities">Maldives • Seychelles • Mauritius</p>
+                    </div>
+                </div>
+                <div class="route-details">
+                    <div class="route-stat">
+                        <Icon Name="event" Size="20px" />
+                        <span>10 Days</span>
+                    </div>
+                    <div class="route-stat">
+                        <Icon Name="location_city" Size="20px" />
+                        <span>5 Islands</span>
+                    </div>
+                    <div class="route-stat">
+                        <Icon Name="groups" Size="20px" />
+                        <span>Max 8</span>
+                    </div>
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+            <div class="route-footer">
+                <span class="route-price">From $3,299</span>
+                <Button Text="Explore" Size="ButtonSize.Small" />
+            </div>
+        </CardFooter>
+    </Card>
+</div>
+
+@code {
+    private List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel> breadcrumbItems = new();
+    private List<TravelGuide> travelGuides = new();
+    private List<TravelGuide> filteredGuides = new();
+    private string selectedFilter = "All";
+
+    protected override void OnInitialized()
+    {
+        breadcrumbItems = new List<Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel>
+        {
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Home") { Url = "/" },
+            new Sysinfocus.AspNetCore.Components.Breadcrumb.BreadcrumbModel("Travel Guides") { Url = "/travel-guides" }
+        };
+
+        // Initialize sample travel guides data
+        travelGuides = new List<TravelGuide>
+        {
+            new TravelGuide
+            {
+                Id = 1,
+                Name = "Paris City Guide",
+                Location = "Paris, France",
+                Description = "Explore the city of lights with our comprehensive guide to Paris attractions and hidden gems.",
+                Icon = "🗼",
+                Category = "City",
+                Rating = 4.9,
+                ReviewCount = 1247,
+                Price = 299,
+                Duration = "5 Days",
+                IsFeatured = true
+            },
+            new TravelGuide
+            {
+                Id = 2,
+                Name = "Bali Paradise",
+                Location = "Bali, Indonesia",
+                Description = "Discover tropical paradise with pristine beaches, ancient temples, and vibrant culture.",
+                Icon = "🏖️",
+                Category = "Beach",
+                Rating = 4.8,
+                ReviewCount = 892,
+                Price = 449,
+                Duration = "7 Days",
+                IsFeatured = true
+            },
+            new TravelGuide
+            {
+                Id = 3,
+                Name = "Swiss Alps Adventure",
+                Location = "Switzerland",
+                Description = "Experience breathtaking mountain scenery and world-class skiing in the Swiss Alps.",
+                Icon = "⛷️",
+                Category = "Adventure",
+                Rating = 4.9,
+                ReviewCount = 654,
+                Price = 899,
+                Duration = "6 Days",
+                IsFeatured = false
+            },
+            new TravelGuide
+            {
+                Id = 4,
+                Name = "Tokyo Explorer",
+                Location = "Tokyo, Japan",
+                Description = "Immerse yourself in the perfect blend of traditional culture and modern technology.",
+                Icon = "🏯",
+                Category = "City",
+                Rating = 4.7,
+                ReviewCount = 1034,
+                Price = 699,
+                Duration = "8 Days",
+                IsFeatured = true
+            },
+            new TravelGuide
+            {
+                Id = 5,
+                Name = "Santorini Dreams",
+                Location = "Santorini, Greece",
+                Description = "Witness stunning sunsets and explore white-washed villages in this Greek island paradise.",
+                Icon = "🏛️",
+                Category = "Beach",
+                Rating = 4.9,
+                ReviewCount = 1523,
+                Price = 599,
+                Duration = "5 Days",
+                IsFeatured = false
+            },
+            new TravelGuide
+            {
+                Id = 6,
+                Name = "Amazon Rainforest",
+                Location = "Amazon, Brazil",
+                Description = "Embark on an unforgettable journey through the world's largest tropical rainforest.",
+                Icon = "🌳",
+                Category = "Adventure",
+                Rating = 4.6,
+                ReviewCount = 423,
+                Price = 1299,
+                Duration = "10 Days",
+                IsFeatured = false
+            },
+            new TravelGuide
+            {
+                Id = 7,
+                Name = "New York Highlights",
+                Location = "New York, USA",
+                Description = "Experience the city that never sleeps with iconic landmarks and world-class entertainment.",
+                Icon = "🗽",
+                Category = "City",
+                Rating = 4.8,
+                ReviewCount = 2103,
+                Price = 499,
+                Duration = "4 Days",
+                IsFeatured = true
+            },
+            new TravelGuide
+            {
+                Id = 8,
+                Name = "Maldives Escape",
+                Location = "Maldives",
+                Description = "Relax in luxury overwater bungalows surrounded by crystal-clear turquoise waters.",
+                Icon = "🏝️",
+                Category = "Beach",
+                Rating = 5.0,
+                ReviewCount = 756,
+                Price = 1899,
+                Duration = "7 Days",
+                IsFeatured = true
+            },
+            new TravelGuide
+            {
+                Id = 9,
+                Name = "Iceland Northern Lights",
+                Location = "Iceland",
+                Description = "Chase the aurora borealis and explore dramatic landscapes of ice and fire.",
+                Icon = "🌌",
+                Category = "Adventure",
+                Rating = 4.9,
+                ReviewCount = 845,
+                Price = 1499,
+                Duration = "9 Days",
+                IsFeatured = false
+            }
+        };
+
+        filteredGuides = travelGuides;
+    }
+
+    private void FilterGuides(string filter)
+    {
+        selectedFilter = filter;
+        
+        if (filter == "All")
+        {
+            filteredGuides = travelGuides;
+        }
+        else if (filter == "Popular")
+        {
+            filteredGuides = travelGuides.Where(g => g.IsFeatured).ToList();
+        }
+        else
+        {
+            filteredGuides = travelGuides.Where(g => g.Category == filter).ToList();
+        }
+    }
+}
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-icon-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+    }
+
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .stat-change {
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .stat-change.positive {
+        color: #16a34a;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .guides-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .guide-card {
+        position: relative;
+        padding: 1rem;
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 1;
+    }
+
+    .guide-icon-large {
+        font-size: 4rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .guide-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        color: #1e293b;
+        text-align: center;
+    }
+
+    .guide-location {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .guide-description {
+        color: #475569;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .guide-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem 0;
+        border-top: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .guide-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .review-count {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+
+    .guide-duration {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .guide-price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .guide-price {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .price-label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    .price-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #3b82f6;
+    }
+
+    .routes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .route-card {
+        padding: 0.5rem;
+    }
+
+    .route-header {
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+        margin-bottom: 1.5rem;
+    }
+
+    .route-icon {
+        font-size: 3rem;
+        flex-shrink: 0;
+    }
+
+    .route-info h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 0.25rem 0;
+        color: #1e293b;
+    }
+
+    .route-cities {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .route-details {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .route-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #475569;
+    }
+
+    .route-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .route-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #3b82f6;
+    }
+
+    /* Responsive adjustments for mobile devices */
+    @@media (max-width: 48rem) {
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
