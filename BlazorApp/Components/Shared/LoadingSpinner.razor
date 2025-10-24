@@ -1,0 +1,82 @@
+@* Reusable loading spinner component *@
+
+<div class="loading-spinner-container @Class">
+    @if (ShowIcon)
+    {
+        <div class="spinner-icon">
+            <Icon Name="@IconName" Size="@IconSize" Class="spinner-rotating" />
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="spinner-message">@Message</p>
+    }
+</div>
+
+<style>
+    .loading-spinner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        gap: 1rem;
+    }
+
+    .spinner-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner-rotating {
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .spinner-message {
+        margin: 0;
+        color: var(--text-secondary, #6b7280);
+        font-size: 0.875rem;
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// Additional CSS classes to apply to the container
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Message to display below the spinner
+    /// </summary>
+    [Parameter]
+    public string Message { get; set; } = "Loading...";
+
+    /// <summary>
+    /// Whether to show the spinner icon
+    /// </summary>
+    [Parameter]
+    public bool ShowIcon { get; set; } = true;
+
+    /// <summary>
+    /// Material icon name to use for the spinner
+    /// </summary>
+    [Parameter]
+    public string IconName { get; set; } = "progress_activity";
+
+    /// <summary>
+    /// Size of the spinner icon
+    /// </summary>
+    [Parameter]
+    public string IconSize { get; set; } = "48px";
+}

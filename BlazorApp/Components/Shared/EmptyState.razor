@@ -1,0 +1,94 @@
+@* Reusable empty state component for when no data is available *@
+
+<div class="empty-state-container @Class">
+    <div class="empty-state-icon">
+        <Icon Name="@IconName" Size="@IconSize" Class="empty-icon" />
+    </div>
+    <h3 class="empty-state-title">@Title</h3>
+    @if (!string.IsNullOrEmpty(Description))
+    {
+        <p class="empty-state-description">@Description</p>
+    }
+    @if (ActionButton != null)
+    {
+        <div class="empty-state-action">
+            @ActionButton
+        </div>
+    }
+</div>
+
+<style>
+    .empty-state-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+
+    .empty-icon {
+        color: var(--text-muted, #9ca3af);
+    }
+
+    .empty-state-title {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .empty-state-description {
+        margin: 0 0 1.5rem 0;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        max-width: 400px;
+    }
+
+    .empty-state-action {
+        margin-top: 0.5rem;
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// Additional CSS classes to apply to the container
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Icon name to display (Material Symbols)
+    /// </summary>
+    [Parameter]
+    public string IconName { get; set; } = "inbox";
+
+    /// <summary>
+    /// Size of the icon
+    /// </summary>
+    [Parameter]
+    public string IconSize { get; set; } = "64px";
+
+    /// <summary>
+    /// Main title text
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = "No items found";
+
+    /// <summary>
+    /// Optional description text
+    /// </summary>
+    [Parameter]
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Optional action button to display
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ActionButton { get; set; }
+}
