@@ -20,42 +20,7 @@
         </div>
         
         <div class="components-grid">
-            <!-- User Profile Card with Avatar -->
-            <Card>
-                <CardHeader>
-                    <div class="card-title-wrapper">
-                        <div class="header-with-avatar">
-                            <Avatar Name="John Doe" Background="seagreen" />
-                            <div>
-                                <h3>User Profile</h3>
-                                <p class="subtitle">Active Account</p>
-                            </div>
-                        </div>
-                    </div>
-                </CardHeader>
-        <CardContent>
-            <div class="profile-info">
-                <div class="info-row">
-                    <Icon Name="email" />
-                    <span>john.doe@example.com</span>
-                </div>
-                <div class="info-row">
-                    <Icon Name="phone" />
-                    <span>+1 234 567 8900</span>
-                </div>
-                <div class="info-row">
-                    <Icon Name="location_on" />
-                    <span>San Francisco, CA</span>
-                </div>
-            </div>
-        </CardContent>
-                <CardFooter>
-                    <div class="card-footer-actions">
-                        <Button Text="Edit Profile" Type="ButtonType.Outline" OnClick="@(() => { })" />
-                        <Button Text="Settings" OnClick="@(() => { })" />
-                    </div>
-                </CardFooter>
-            </Card>
+            <UserProfile />
 
             <!-- Form with Labels and Inputs -->
             <Card>
