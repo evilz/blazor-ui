@@ -144,7 +144,7 @@
         var parts = email.Split('@');
         if (parts.Length > 0 && parts[0].Length >= 2)
         {
-            return parts[0].Substring(0, 2).ToUpper();
+            return parts[0][..2].ToUpper();
         }
         return "CM";
     }

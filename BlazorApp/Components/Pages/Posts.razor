@@ -143,11 +143,7 @@
 
     private string TruncateTitle(string title)
     {
-        if (title.Length > 50)
-        {
-            return title.Substring(0, 50) + "...";
-        }
-        return title;
+        return title.Length > 50 ? title[..50] + "..." : title;
     }
 
     private string GetPostDate(int postId)
