@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Sysinfocus.AspNetCore.Components" Version="0.0.3.4" />
+    <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.3" />
   </ItemGroup>
 
 
