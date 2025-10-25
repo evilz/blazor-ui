@@ -107,8 +107,20 @@ public class MockJsonPlaceholderService : IJsonPlaceholderService
         return photos;
     }
 
-    public Task<Post?> GetPostAsync(int id) => throw new NotImplementedException();
-    public Task<List<Comment>> GetPostCommentsAsync(int postId) => throw new NotImplementedException();
+    public async Task<Post?> GetPostAsync(int id)
+    {
+        await Task.Delay(100);
+        var posts = await GetPostsAsync();
+        return posts.FirstOrDefault(p => p.Id == id);
+    }
+
+    public async Task<List<Comment>> GetPostCommentsAsync(int postId)
+    {
+        await Task.Delay(100);
+        var allComments = await GetCommentsAsync();
+        return allComments.Where(c => c.PostId == postId).ToList();
+    }
+
     public Task<User?> GetUserAsync(int id) => throw new NotImplementedException();
     public Task<List<Todo>> GetUserTodosAsync(int userId) => throw new NotImplementedException();
     public Task<List<Album>> GetUserAlbumsAsync(int userId) => throw new NotImplementedException();

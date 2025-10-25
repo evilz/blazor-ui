@@ -3,50 +3,106 @@
 @using BlazorApp.Models
 @using BlazorApp.Services
 @inject IJsonPlaceholderService JsonPlaceholderService
+@inject NavigationManager Navigation
 
 <PageTitle>Comments - Blazor UI</PageTitle>
 
-<div class="page-header">
-    <Breadcrumb Items="@breadcrumbItems" />
-    <h1>Comments</h1>
-    <p>Browse comments from JSONPlaceholder API</p>
-</div>
-
-@if (isLoading)
-{
-    <div class="loading">Loading comments...</div>
-}
-else if (comments.Count == 0)
-{
-    <Card>
-        <CardContent>
-            <p>No comments found.</p>
-        </CardContent>
-    </Card>
-}
-else
-{
-    <div class="comments-list">
-        @foreach (var comment in comments.Take(30))
-        {
-            <Card>
-                <CardHeader>
-                    <div class="comment-header">
-                        <div>
-                            <h4>@comment.Name</h4>
-                            <p class="comment-email">@comment.Email</p>
-                        </div>
-                        <Badge Text="@($"Post {comment.PostId}")" Type="BadgeType.Outline" />
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <p class="comment-body">@comment.Body</p>
-                    <small class="comment-id">Comment #@comment.Id</small>
-                </CardContent>
-            </Card>
-        }
+<div class="mx-auto max-w-4xl p-4 md:p-6">
+    <!-- Header -->
+    <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center md:mb-8">
+        <div>
+            <Breadcrumb Items="@breadcrumbItems" />
+            <h1 class="text-foreground text-xl font-semibold md:text-2xl">All Comments</h1>
+        </div>
+        <div class="flex items-center gap-3 md:gap-4">
+            <Button Icon="filter_list" Type="ButtonType.Ghost" Size="ButtonSize.Small" Tooltip="Filter comments" />
+        </div>
     </div>
-}
+
+    @if (isLoading)
+    {
+        <div class="loading">Loading comments...</div>
+    }
+    else if (comments.Count == 0)
+    {
+        <Card>
+            <CardContent>
+                <p>No comments found.</p>
+            </CardContent>
+        </Card>
+    }
+    else
+    {
+        <!-- Activity Timeline -->
+        <div class="space-y-4 md:space-y-6">
+            @{
+                string currentDate = "";
+            }
+            @foreach (var comment in comments.Take(30))
+            {
+                var commentDate = GetCommentDate(comment.Id);
+                var showDate = currentDate != commentDate;
+                if (showDate)
+                {
+                    currentDate = commentDate;
+                }
+
+                <div key="@comment.Id">
+                    @if (showDate)
+                    {
+                        <!-- Date Header -->
+                        <div class="text-muted-foreground mb-3 text-xs font-medium tracking-wide uppercase md:mb-4 md:text-sm">
+                            @commentDate
+                        </div>
+                    }
+
+                    <!-- Comment Item -->
+                    <div class="relative flex gap-2 md:gap-3">
+                        <!-- Timeline Line -->
+                        @if (comment.Id != comments.Take(30).Last().Id)
+                        {
+                            <div class="bg-border absolute top-10 bottom-0 left-3 w-px md:top-12 md:left-4"></div>
+                        }
+
+                        <!-- Avatar -->
+                        <div class="relative z-10">
+                            <Avatar Name="@GetCommentInitials(comment.Email)" />
+                        </div>
+
+                        <!-- Content -->
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-col gap-1 text-xs sm:flex-row sm:items-center sm:gap-2 md:text-sm">
+                                <div class="flex flex-wrap items-center gap-1 sm:gap-2">
+                                    <span class="text-foreground font-medium capitalize">@comment.Name</span>
+                                    <span class="text-muted-foreground">commented on</span>
+                                    <span class="text-foreground font-medium cursor-pointer hover:underline" @onclick="() => NavigateToPost(comment.PostId)">Post #@comment.PostId</span>
+                                </div>
+                                <span class="text-muted-foreground text-xs sm:ml-auto md:text-sm">
+                                    @GetCommentTime(comment.Id)
+                                </span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mt-1">
+                                <span class="text-xs text-blue-600">@comment.Email</span>
+                            </div>
+
+                            <!-- Comment Body -->
+                            <div class="bg-muted text-muted-foreground mt-2 rounded-lg p-2 text-xs leading-relaxed md:mt-3 md:p-3 md:text-sm">
+                                @comment.Body
+                            </div>
+
+                            <!-- Comment Badge -->
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <Badge Text="@($"Comment #{comment.Id}")" Type="BadgeType.Outline" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
 
 @code {
     private List<Comment> comments = new();
@@ -77,66 +133,81 @@ else
             isLoading = false;
         }
     }
+
+    private void NavigateToPost(int postId)
+    {
+        Navigation.NavigateTo($"/posts/{postId}");
+    }
+
+    private string GetCommentInitials(string email)
+    {
+        var parts = email.Split('@');
+        if (parts.Length > 0 && parts[0].Length >= 2)
+        {
+            return parts[0][..2].ToUpper();
+        }
+        return "CM";
+    }
+
+    private string GetCommentDate(int commentId)
+    {
+        // Simulate different dates based on comment ID for demo purposes
+        var baseDate = DateTime.Now;
+        var daysAgo = (commentId - 1) / 5; // Group comments by date
+        var date = baseDate.AddDays(-daysAgo);
+        return date.ToString("dddd, dd MMMM").ToUpper();
+    }
+
+    private string GetCommentTime(int commentId)
+    {
+        // Simulate different times based on comment ID
+        var baseTime = DateTime.Now;
+        var hoursAgo = (commentId - 1) % 12;
+        var time = baseTime.AddHours(-hoursAgo);
+        return time.ToString("hh:mm tt");
+    }
 }
 
 <style>
-    .page-header {
-        margin-bottom: 2rem;
-    }
-
-    .page-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.25rem;
-        color: #1e293b;
-    }
-
-    .page-header p {
-        color: #64748b;
-        margin: 0;
-    }
-
     .loading {
         text-align: center;
         padding: 2rem;
-        color: #64748b;
+        color: var(--muted-foreground, #64748b);
     }
 
-    .comments-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
+    .text-foreground {
+        color: var(--foreground, #1e293b);
     }
 
-    .comment-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1rem;
+    .text-muted-foreground {
+        color: var(--muted-foreground, #64748b);
     }
 
-    .comment-header h4 {
-        margin: 0 0 0.25rem 0;
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1e293b;
+    .bg-muted {
+        background-color: var(--muted, #f1f5f9);
+    }
+
+    .bg-border {
+        background-color: var(--border, #e2e8f0);
+    }
+
+    .text-blue-600 {
+        color: #2563eb;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .hover\:underline:hover {
+        text-decoration: underline;
+    }
+
+    .capitalize {
         text-transform: capitalize;
     }
 
-    .comment-email {
-        margin: 0;
-        font-size: 0.875rem;
-        color: #3b82f6;
-    }
-
-    .comment-body {
-        color: #475569;
-        line-height: 1.6;
-        margin: 0 0 1rem 0;
-    }
-
-    .comment-id {
-        color: #94a3b8;
-        font-size: 0.875rem;
+    .uppercase {
+        text-transform: uppercase;
     }
 </style>
