@@ -1,7 +1,15 @@
 @using BlazorApp.Models
+@using Blazor.Diagrams.Core.Models
+@using Blazor.Diagrams.Components.Renderers
 @inherits ComponentBase
 
 <div class="db-table">
+    @* Render ports on all four sides *@
+    @foreach (var port in Node.Ports)
+    {
+        <PortRenderer Port="port" Class="@GetPortClass(port)" />
+    }
+    
     <div class="table-header">
         <Icon Name="table_chart" Size="18px" />
         <input type="text" class="table-name-input" @bind="Node.TableName" @bind:event="oninput" />
@@ -71,6 +79,18 @@
         // Toggle current field
         field.IsPrimaryKey = !field.IsPrimaryKey;
     }
+
+    private string GetPortClass(PortModel port)
+    {
+        return port.Alignment switch
+        {
+            PortAlignment.Top => "port-top",
+            PortAlignment.Right => "port-right",
+            PortAlignment.Bottom => "port-bottom",
+            PortAlignment.Left => "port-left",
+            _ => ""
+        };
+    }
 }
 
 <style>
@@ -82,7 +102,75 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         cursor: move;
         transition: box-shadow 0.2s;
+        position: relative;
     }
+
+    /* Port styles */
+    .db-table :deep(.port-top),
+    .db-table :deep(.port-right),
+    .db-table :deep(.port-bottom),
+    .db-table :deep(.port-left) {
+        width: 12px;
+        height: 12px;
+        background: #3b82f6;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        position: absolute;
+        cursor: crosshair;
+        transition: all 0.2s;
+        z-index: 10;
+        transform-origin: center;
+    }
+
+    .db-table :deep(.port-top):hover,
+    .db-table :deep(.port-right):hover,
+    .db-table :deep(.port-bottom):hover,
+    .db-table :deep(.port-left):hover {
+        transform: scale(1.33);
+        background: #667eea;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+
+    .db-table :deep(.port-top) {
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .db-table :deep(.port-top):hover {
+        transform: translate(-50%, -50%) scale(1.33);
+    }
+
+    .db-table :deep(.port-right) {
+        top: 50%;
+        right: 0;
+        transform: translate(50%, -50%);
+    }
+
+    .db-table :deep(.port-right):hover {
+        transform: translate(50%, -50%) scale(1.33);
+    }
+
+    .db-table :deep(.port-bottom) {
+        bottom: 0;
+        left: 50%;
+        transform: translate(-50%, 50%);
+    }
+
+    .db-table :deep(.port-bottom):hover {
+        transform: translate(-50%, 50%) scale(1.33);
+    }
+
+    .db-table :deep(.port-left) {
+        top: 50%;
+        left: 0;
+        transform: translate(-50%, -50%);
+    }
+
+    .db-table :deep(.port-left):hover {
+        transform: translate(-50%, -50%) scale(1.33);
+    }
+
 
     .db-table:hover {
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
