@@ -1,0 +1,226 @@
+@page "/activity-feed"
+@rendermode InteractiveServer
+@using Sysinfocus.AspNetCore.Components
+
+<PageTitle>Activity Feed - Blazor UI</PageTitle>
+
+<div class="page-header">
+    <h1>Activity log</h1>
+    <p>Track all activities and changes in your workspace</p>
+</div>
+
+<div class="activity-controls">
+    <div class="control-item">
+        <span class="control-label">Show mentioned only</span>
+        <input type="checkbox" @bind="showMentionedOnly" class="form-check-input" />
+    </div>
+    <Button Icon="filter_list" Type="ButtonType.Ghost" Size="ButtonSize.Small" Tooltip="Filter activities" />
+</div>
+
+<div class="activity-container">
+    <ActivityLog Items="@filteredLogs" Animate />
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--foreground, #1e293b);
+    }
+
+    .page-header p {
+        color: var(--muted-foreground, #64748b);
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .activity-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .control-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .control-label {
+        font-size: 0.875rem;
+        color: var(--muted-foreground, #64748b);
+    }
+
+    .activity-container {
+        max-width: 56rem;
+        margin: 0 auto;
+    }
+
+    @@media (max-width: 640px) {
+        .page-header h1 {
+            font-size: 1.25rem;
+        }
+
+        .activity-controls {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+@code {
+    private bool showMentionedOnly = false;
+    private List<Log> logs = new();
+    private List<Log> filteredLogs => showMentionedOnly 
+        ? logs.Where(l => l.Description.Contains("mentioned", StringComparison.OrdinalIgnoreCase)).ToList()
+        : logs;
+
+    protected override void OnInitialized()
+    {
+        logs = new List<Log>
+        {
+            // Status changes
+            new("Angelina Gotelli", 
+                "", 
+                "Status Change", 
+                "has changed PD-979 status to Completed", 
+                DateTime.Now.AddHours(-2).AddMinutes(-40), 
+                ActivityEnum.Update),
+            
+            // Comments
+            new("Max Alexander", 
+                $"https://randomuser.me/api/portraits/men/{DateTime.Now.Second % 50}.jpg", 
+                "Comment", 
+                "comment on your Post: Fine, Java MIGHT be a good example of what a programming language should be like. But Java applications are good examples of what applications SHOULDN'T be like.", 
+                DateTime.Now.AddHours(-2).AddMinutes(-7), 
+                ActivityEnum.Create),
+            
+            // Tags
+            new("Eugene Stewart", 
+                "", 
+                "Tag", 
+                "added tags Live Issue and Backend", 
+                DateTime.Now.AddHours(-3).AddMinutes(-20), 
+                ActivityEnum.Create),
+            
+            // File uploads
+            new("Shannon Baker", 
+                "", 
+                "File", 
+                "added document.csv", 
+                DateTime.Now.AddHours(-4).AddMinutes(-42), 
+                ActivityEnum.Create),
+            
+            // Mentions
+            new("Roberta Horton", 
+                $"https://randomuser.me/api/portraits/women/{DateTime.Now.Second % 50}.jpg", 
+                "Mention", 
+                "mentioned you in a comment on Post: @You One of the main causes of the fall of the Roman Empire was that-lacking zero-they had no way to indicate successful termination of their C programs.", 
+                DateTime.Now.AddHours(-5).AddMinutes(-43), 
+                ActivityEnum.Create),
+            
+            // Assignments
+            new("Lee Wheeler", 
+                "", 
+                "Assignment", 
+                "assigned ticket PD-1092 to Alvin Moreno", 
+                DateTime.Now.AddHours(-6).AddMinutes(-47), 
+                ActivityEnum.Update),
+            
+            // More comments (previous day)
+            new("Jessica Wells", 
+                $"https://randomuser.me/api/portraits/women/{DateTime.Now.Second % 30}.jpg", 
+                "Comment", 
+                "comment on your Post: The trouble with programmers is that you can never tell what a programmer is doing until it's too late.", 
+                DateTime.Now.AddDays(-1).AddHours(8).AddMinutes(49), 
+                ActivityEnum.Create),
+            
+            // Status changes (previous day)
+            new("Earl Miles", 
+                $"https://randomuser.me/api/portraits/men/{DateTime.Now.Second % 30}.jpg", 
+                "Status Change", 
+                "has changed PD-977 status to In progress", 
+                DateTime.Now.AddDays(-1).AddHours(8).AddMinutes(30), 
+                ActivityEnum.Update),
+
+            // Additional activities to make it more comprehensive
+            new("admin", 
+                $"https://randomuser.me/api/portraits/men/{DateTime.Now.Second % 1}.jpg", 
+                "User", 
+                "'student' created", 
+                DateTime.Now.AddDays(-10), 
+                ActivityEnum.Create),
+            
+            new("student", 
+                $"https://randomuser.me/api/portraits/women/{DateTime.Now.Second % 2}.jpg", 
+                "Login", 
+                "'student' logged in", 
+                DateTime.Now.AddDays(-10), 
+                ActivityEnum.Read),
+            
+            new("admin", 
+                $"https://randomuser.me/api/portraits/men/{DateTime.Now.Second % 1}.jpg", 
+                "User", 
+                "'teacher-1' created", 
+                DateTime.Now.AddDays(-9), 
+                ActivityEnum.Create),
+            
+            new("management", 
+                $"https://randomuser.me/api/portraits/women/{DateTime.Now.Second % 4}.jpg", 
+                "Reports", 
+                "'management' looked into X report", 
+                DateTime.Now.AddDays(-9), 
+                ActivityEnum.Read),
+            
+            new("teacher-1", 
+                $"https://randomuser.me/api/portraits/men/{DateTime.Now.Second % 5}.jpg", 
+                "Syllabus", 
+                "'teacher-1' updated PU - Science - I - Physics - Physical World", 
+                DateTime.Now.AddDays(-8), 
+                ActivityEnum.Update),
+            
+            new("teacher-3", 
+                $"https://randomuser.me/api/portraits/men/{DateTime.Now.Second % 6}.jpg", 
+                "Syllabus", 
+                "'teacher-3' created PU - Science - I - Physics - Units and Measurements", 
+                DateTime.Now.AddDays(-8), 
+                ActivityEnum.Create),
+            
+            new("teacher-2", 
+                $"https://randomuser.me/api/portraits/women/{DateTime.Now.Second % 7}.jpg", 
+                "Syllabus", 
+                "'teacher-2' deleted PU - Science - I - Physics - Physical World", 
+                DateTime.Now.AddDays(-7), 
+                ActivityEnum.Delete),
+            
+            new("student-1", 
+                $"https://randomuser.me/api/portraits/women/{DateTime.Now.Second % 8}.jpg", 
+                "User", 
+                "'username' created", 
+                DateTime.Now.AddDays(-7), 
+                ActivityEnum.Create),
+            
+            new("student-2", 
+                $"https://randomuser.me/api/portraits/men/{DateTime.Now.Second % 9}.jpg", 
+                "User", 
+                "'username' created", 
+                DateTime.Now.AddDays(-6), 
+                ActivityEnum.Create),
+            
+            new("student-3", 
+                $"https://randomuser.me/api/portraits/women/{DateTime.Now.Second % 10}.jpg", 
+                "User", 
+                "'username' created", 
+                DateTime.Now.AddDays(-6), 
+                ActivityEnum.Create),
+        };
+    }
+}
