@@ -3,6 +3,7 @@
 @using BlazorApp.Models
 @using BlazorApp.Components.DatabaseSchema
 @using Blazor.Diagrams.Core.Geometry
+@implements IDisposable
 
 <PageTitle>Database Schema Designer - Blazor UI</PageTitle>
 
@@ -14,6 +15,7 @@
 <div class="schema-designer">
     <div class="toolbar">
         <Button Text="Add Table" Icon="add_box" OnClick="AddTable" />
+        <Button Text="Delete Selected" Icon="delete" Type="ButtonType.Destructive" OnClick="DeleteSelected" />
         <Button Text="Clear All" Icon="delete_sweep" Type="ButtonType.Destructive" OnClick="ClearSchema" />
         <div class="toolbar-spacer"></div>
         <Button Text="Export SQL" Icon="code" Type="ButtonType.Secondary" OnClick="ExportSQL" />
@@ -40,9 +42,15 @@
         Diagram.Options.Zoom.Enabled = true;
         Diagram.Options.Links.DefaultColor = "#3b82f6";
         Diagram.Options.Links.DefaultSelectedColor = "#667eea";
+        
+        // Enable interactive link creation by dragging between ports
+        Diagram.Options.Links.RequireTarget = true;
 
         // Register the custom node widget
         Diagram.RegisterComponent<TableNode, TableNodeWidget>();
+        
+        // Subscribe to keyboard events for Delete key
+        Diagram.KeyDown += OnKeyDown;
 
         // Initialize with sample tables
         var usersTable = new TableNode(new Point(50, 50))
@@ -104,6 +112,23 @@
         Diagram.Nodes.Add(newTable);
     }
 
+    private void DeleteSelected()
+    {
+        // Delete selected links
+        var selectedLinks = Diagram.Links.Where(l => l.Selected).ToList();
+        foreach (var link in selectedLinks)
+        {
+            Diagram.Links.Remove(link);
+        }
+
+        // Delete selected nodes
+        var selectedNodes = Diagram.Nodes.Where(n => n.Selected).ToList();
+        foreach (var node in selectedNodes)
+        {
+            Diagram.Nodes.Remove(node);
+        }
+    }
+
     private void ClearSchema()
     {
         Diagram.Nodes.Clear();
@@ -121,6 +146,19 @@
     {
         // TODO: Implement schema save functionality
         // This would save the schema to local storage or database
+    }
+
+    private void OnKeyDown(Blazor.Diagrams.Core.Events.KeyboardEventArgs e)
+    {
+        if (e.Key == "Delete" || e.Key == "Backspace")
+        {
+            DeleteSelected();
+        }
+    }
+
+    public void Dispose()
+    {
+        Diagram.KeyDown -= OnKeyDown;
     }
 }
 
