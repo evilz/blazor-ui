@@ -29,6 +29,9 @@ builder.Services.AddScoped<ICalendarService, MockCalendarService>();
 // Add Document service
 builder.Services.AddScoped<IDocumentService, MockDocumentService>();
 
+// Add Kanban service
+builder.Services.AddScoped<IKanbanService, MockKanbanService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
