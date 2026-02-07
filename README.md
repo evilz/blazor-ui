@@ -62,7 +62,7 @@ npm install
 dotnet run
 ```
 
-> Note: the project invokes the Tailwind CLI on build (`npx @tailwindcss/cli ...`), so installing the npm dependencies first avoids build-time errors.
+> Note: The project uses the Tailwind CSS CLI during the build process. To ensure the build succeeds, you must first install the required npm dependencies.
 
 Navigate to `http://localhost:5005` in your browser.
 
