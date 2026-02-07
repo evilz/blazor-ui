@@ -57,8 +57,12 @@ This template includes a library of reusable UI components following best practi
 
 ```bash
 cd BlazorApp
+npm install
+
 dotnet run
 ```
+
+> Note: the project invokes the Tailwind CLI on build (`npx @tailwindcss/cli ...`), so installing the npm dependencies first avoids build-time errors.
 
 Navigate to `http://localhost:5005` in your browser.
 
